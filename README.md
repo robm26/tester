@@ -1,6 +1,6 @@
 # tester
 
-Database developers need both vision and experience to create effective database applications. Knowing the full feature set of the database service is a start, but it's difficult to know in advance whether a particular solution will meet performace and efficienty requrements. 
+Database developers need both vision and experience to create effective database applications. Knowing the full feature set of the database service is a start, but it's difficult to know in advance whether a particular solution will meet performance and efficienty requrements. 
 
 
 This testing framework will allow you to:
