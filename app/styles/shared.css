@@ -1,0 +1,437 @@
+
+.rootContainer {
+    background-color:whitesmoke;
+    border: none;
+    border-radius:6px;
+    padding:5px;
+    font-family:Arial;
+}
+.jobsContainer {
+    background-color:whitesmoke;
+    font-family:Arial;
+}
+
+.menuContainer {
+    font-family:Arial;
+}
+.menuList {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: gainsboro;
+    border-radius:6px;
+}
+
+.menuList li {
+    float: left;
+}
+/*.menuList li:first-of-type a {*/
+/*    */
+/*}*/
+.titleLink {
+    color:steelblue;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+    padding: 16px;
+    font-size:larger;
+    font-style: italic;
+    font-weight: bold;
+
+}
+.menuHourglass {
+    display: block;
+    color: dimgrey;
+    text-align: center;
+    padding: 10px;
+    text-decoration: none;
+    animation: rotation 4s infinite linear;
+
+}
+.menuHourglassListItemActive {
+    margin-top: 5px;
+    border-radius: 5px;
+    background-color: lightgreen;
+}
+
+.menuHourglassListItemDefault {
+    margin-top: 5px;
+}
+
+@keyframes rotation {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(359deg);}
+}
+
+.menuLink {
+    display: block;
+    color: dimgrey;
+    text-align: center;
+    padding: 16px;
+    text-decoration: none;
+
+}
+.menuLinkSelected {
+    display: block;
+    color: dimgrey;
+    text-align: center;
+    padding: 16px;
+    text-decoration: none;
+    background-color: lightgrey;
+    font-weight:bold;
+
+}
+
+.menuList li a:hover {
+    background-color: lightgrey;
+}
+
+.jsonText {
+    background-color:lavender;
+    height:100px;
+    width: 500px;
+
+}
+
+
+.jobList a {
+    text-decoration:none;
+    color: grey;
+}
+
+.jobList td {
+    padding:5px;
+    border:none;
+
+}
+
+.jobSelected {
+    background-color: lightgrey;
+    font-weight:bold;
+
+}
+.jobSelected a {
+    color: steelblue;
+}
+
+.jobDetailsTitle {
+    color: grey;
+    text-align:right;
+    font-size:smaller;
+
+}
+.errorPanel {
+    background-color: LavenderBlush;
+    margin:10px;
+    padding:10px;
+    border-radius:5px;
+}
+
+
+.sqlTable {
+    background-color: whitesmoke;
+    border:none;
+    padding:3px;
+
+}
+
+.sqlTable th, td {
+    padding:5px;
+    margin:5px;
+    background-color: lightgrey;
+    color:dimgrey;
+    border-bottom:1px solid gainsboro;
+    border-right:1px solid gainsboro;
+
+}
+.sqlTable th {
+    font-weight:unset;
+    background-color: silver;
+    color:black;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    position: sticky;
+    top: 0;
+    border-bottom:3px solid whitesmoke;
+}
+
+.sqlTable [highlight='highlight'] {
+    border:2px solid crimson;
+
+}
+
+.sqlTableDiv {
+    max-height: 90vh;
+    overflow: auto;
+}
+
+.sqlNull {
+    background-color: whitesmoke;
+}
+
+.sqlTable tr:hover td:empty {
+    filter: brightness(90%);
+}
+
+.sqlTable tr:hover td {
+    filter: brightness(90%);
+}
+
+
+.intro {
+    color: dimgrey;
+    padding:10px;
+}
+
+.sqlInput {
+    background-color: gainsboro;
+    border: none;
+    padding:5px;
+    width:500px;
+    height: 100px;
+    border-radius:5px;
+    margin:3px;
+}
+
+#jobForm button {
+    border-radius:3px;
+}
+#jobForm button:hover {
+    background-color: silver;
+}
+
+.chartPanel {
+    background-color: FFF;
+    border: 1px solid silver;
+    border-radius:6px;
+    margin:10px;
+    padding:10px;
+    color:grey;
+    width:500px;
+}
+
+.sqlTableForm button {
+
+    background-color: silver;
+    margin-left: 15px;
+    margin-bottom:15px;
+}
+.sqlTableDiv  {
+    border-radius:16px;
+    padding:1px;
+    width: fit-content;
+}
+.jobCode {
+    background-color: green;
+    border: 1px solid gainsboro;
+    border-radius: 5px;
+}
+
+.jobFormTableDiv {
+    background-color:gainsboro;
+    border-radius:6px;
+    padding:5px;
+    width: fit-content;
+
+}
+.jobFormTable {
+    border-radius: 15px;
+    border-collapse:collapse;
+}
+.jobFormTable td {
+    background-color:gainsboro;
+    padding:6px;
+
+    border:0px;
+    vertical-align:top;
+}
+
+
+.jobsBody {
+    vertical-align: top;
+}
+.jobsBody table {
+    border-collapse: collapse;
+}
+.jobsBody td {
+    vertical-align: top;
+}
+.jobRoot {
+    background-color: gainsboro;
+}
+.viewCodeTextarea {
+    background-color: whitesmoke;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: scroll;
+}
+.previewRowsTable td {
+    background-color: whitesmoke;
+}
+
+.tdBlank {
+    background-color:whitesmoke;
+    border:none;
+}
+.setupBody td {
+    background-color: whitesmoke;
+    border:none;
+}
+
+.mysqlConnectionInfo td {
+    font-size: smaller;
+}
+.mysqlConnectionInfo td:nth-child(2) {
+    background-color:#EED;
+}
+
+.ddbConnectionInfo td {
+    font-size: smaller;
+}
+.ddbConnectionInfo td:nth-child(2) {
+    background-color:#DEE;
+}
+
+.mysqlTitle {
+
+    font-weight:bold;
+}
+.dynamodbTitle {
+
+    font-weight:bold;
+}
+.path {
+    font-family: monospace;
+    font-size:smaller;
+}
+.path:hover {
+    color:black;
+    border: 2px solid red;
+    border-radius:5px;
+
+}
+.mysqlSetupButton {
+    font-weight:bold;
+    background-color:#EED;
+    border-radius:5px;
+}
+.ddbSetupButton {
+    font-weight:bold;
+    background-color:#DEE;
+    border-radius:5px;
+}
+
+.createOutput {
+
+    border-radius:5px;
+    padding:5px;
+    font-family: monospace;
+}
+
+.resultDisplayTable  td, th {
+    padding:2px;
+    border-radius: 0px;
+    background-color: #bcd;
+    font-size:smaller;
+}
+.jobResultsTable {
+    background-color:gainsboro;
+    border-radius:6px;
+}
+.jobResultsSummaryTable {
+    margin: 5px;
+    border-radius:6px;
+}
+.jobResultsSummaryTable td {
+    background-color:silver;
+    padding:5px;
+    text-align:center;
+}
+.jobResultsSummaryTable th {
+    background-color:DarkGray;
+    padding:5px;
+    text-align:center;
+}
+.jobResultsSummaryTable td:nth-child(2) {
+    color:Brown;
+    font-size:larger;
+    padding:5px;
+}
+.jobInputs {
+    border:none;
+    padding:3px;
+    border-radius:3px;
+    background-color:FloralWhite;
+}
+.clearExperimentsButton {
+    font-size:smaller;
+    color:grey;
+    background-color:silver;
+    border:none;
+    border-radius:5px;
+}
+.jobsWelcome {
+    padding:10px;
+    border-radius:5px;
+    background-color:lightgrey;
+    margin-left:10px;
+    color:dimgray;
+}
+.jobsWelcome span {
+    font-size:larger;
+    font-weight:bold;
+}
+.jobsWelcome a {
+    color:dimgrey;
+}
+.downloadDiv {
+    color:grey;
+    padding:3px;
+    font-size:x-small;
+    float:right;
+
+}
+.downloadDiv a {
+    color:dimgray;
+}
+.expListTd {
+
+    border-left:5px solid whitesmoke;
+}
+.chartDiv {
+    width:600px;
+    height:500px;
+    margin-bottom:20px;
+
+}
+
+.jobResultsSummaryTable a {
+    color:black;
+    font-size:smaller;
+}
+
+.setupTableButton {
+    border:none;
+    font-size:larger;
+    background-color:gainsboro;
+    color:dimgrey;
+}
+
+.setupFileContents {
+    font-family: monospace;
+    color:dimgrey;
+    padding:10px;
+    border-radius:5px;
+    padding:10px;
+}
+.experimentResultSummaryTable {
+    margin-left:60px;
+}
+.experimentResultSummaryTable td {
+    text-align:center;
+}
+.noJobMsg {
+    background-color:whitesmoke;
+    border:none;
+}

@@ -1,19 +1,14 @@
 import * as fs from 'node:fs/promises';
-import { runPartiQL, runPut, runWarm } from "./database.js";
-import { PutObjectCommand, S3Client, S3ServiceException } from "@aws-sdk/client-s3";
-
-import config from '../config.json' with { type: 'json' };
-
-const bucketName = 'tester-data'; // config().bucket;
+import { runSql} from "../components/database.mjs";
+import { runPartiQL } from "../components/database.mjs";
 
 const experimentResultsRoot = 'public/experiments';
 
 const currentPath = process.cwd().split('/');
 const currentFolder = currentPath.slice(-1)[0];
 
-let pathToJobsFolder = './';
-
-let pathToExperimentsFolder = '../' + experimentResultsRoot + '/';
+let pathToJobsFolder = '../../jobs/'; // path if running a unit test
+let pathToExperimentsFolder = '../../' + experimentResultsRoot + '/';
 if(currentFolder === 'jobs') {
     pathToExperimentsFolder = '../' + experimentResultsRoot + '/';
 }
@@ -28,15 +23,12 @@ if(args.length === 3 && args[2] == 'build/index.js') { // live app
 
 const runJob = async (params) => {
 
-    console.log('Job parameters:\n' + JSON.stringify(params, null, 2));
     const experiment = params['experiment'];
     const test = params['test'];
     const dbEngine = params['dbEngine'];
     const targetTable = params['targetTable'];
     const items = params['items'];
     const PK = params['PK'];
-    const SK = params['SK'] || null;
-
     const jobFile = params['jobFile'];
 
     const jobFileNameImport = pathToJobsFolder + jobFile;
@@ -54,8 +46,6 @@ const runJob = async (params) => {
     let jobTimestampMs = 0;
     let jobElapsed = 0;
     let requestsThisSecond = 0;
-
-    const warmed = await runWarm(targetTable, PK, SK);
 
     let startMs = Date.now();
     const startSec = Math.floor(startMs/1000);
@@ -108,24 +98,25 @@ const runJob = async (params) => {
 
             const pkValue = row[PK];
 
+
             let rowResult;
 
-            const pqlDoubleQuotes = "INSERT INTO " + targetTable + " VALUE " + JSON.stringify(row) + ";";
-            const pql = pqlDoubleQuotes.replaceAll('"', "'");
-
-            try {
-                // rowResult = await runPartiQL(pql);
-                rowResult = await runPut(targetTable, row);
-
-            } catch (err) { 
-                console.error('Error: ' + JSON.stringify(err, null, 2));
+            if(dbEngine === 'mysql') {
+                const sql = 'INSERT INTO ' + targetTable + ' (' + Object.keys(row).join(",") + ') '
+                    + 'VALUES (' + Object.values(row).map(val=> "'" + val + "'").join(",") + ');';
+                rowResult = await runSql(sql);
             }
-            
-            // console.log('rowResult: ' + JSON.stringify(rowResult, null, 2));
 
-            httpStatusCode = rowResult?.result?.$metadata?.httpStatusCode || rowResult?.result?.error?.code;
-            attempts = rowResult?.result?.$metadata?.attempts || rowResult?.result?.error?.attempts;
+            if(dbEngine === 'dynamodb') {
+                const pqlDoubleQuotes = "INSERT INTO " + targetTable + " VALUE " + JSON.stringify(row) + ";";
+                const pql = pqlDoubleQuotes.replaceAll('"', "'");
 
+                rowResult = await runPartiQL(pql);
+
+                httpStatusCode = rowResult?.result?.$metadata?.httpStatusCode || rowResult?.result?.error?.code;
+                attempts = rowResult?.result?.$metadata?.attempts || rowResult?.result?.error?.attempts;
+
+            }
 
             rowSummary = {
                 rowNum: rowNum,
@@ -133,14 +124,14 @@ const runJob = async (params) => {
                 experiment: experiment,
                 test: test,
                 jobFile: jobFile,
-                operation: rowResult?.operation,
+                operation: rowResult.operation,
                 targetTable:targetTable,
                 PK: pkValue,
                 jobTimestamp: jobTimestamp,
                 jobSecond: jobSecond,
                 jobTimestampMs: jobTimestampMs,
                 jobElapsed: jobElapsed,
-                latency: rowResult?.latency,
+                latency: rowResult.latency,
                 velocity: null,
                 httpStatusCode: httpStatusCode,
                 attempts: attempts,
@@ -170,7 +161,6 @@ const runJob = async (params) => {
 
     const dir = pathToExperimentsFolder + experiment;
 
-    // make local folder and file
     await fs.mkdir(dir, { recursive: true });
 
     try {
@@ -181,24 +171,6 @@ const runJob = async (params) => {
         }
     }
     await fs.appendFile( dir + '/data.csv', resultsFileData, 'utf-8', { flag: 'a' } );
-
-    // put folder and file in S3
-
-    const key = 'exp/' + experiment + '/data.csv';
-
-    // const client = new S3Client({});
-    // const command = new PutObjectCommand({
-    //   Bucket: bucketName,
-    //   Key: key,
-    //   Body: resultsFileData,
-    // });
-
-    // try {
-    //     const response = await client.send(command);
-    //     // console.log('HTTP ' + response.$metadata.httpStatusCode + ' for s3://' + bucketName + '/' + key);
-    //   } catch (caught) {
-    //     console.error(JSON.stringify(caught, null, 2));
-    //   }
 
     return jobResults;
 }

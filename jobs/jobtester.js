@@ -1,20 +1,25 @@
 import {runJob} from "./jobExec.js";
 
 const run = async () => {
+    const expName = 'E' + Math.floor(new Date().getTime() / 1000).toString();
+    // const warmed = await runWarm({targetTable: 'MREC'});
 
-    const params = {
-        experiment: 'Exp3',
-        test: 'EventsTest',
+    let params;
+    params = {
+        experiment: expName,
+        test: 'MREC',
         dbEngine: 'dynamodb',
-        targetTable: 'everysize',
-        items: 2,
-        PK: 'size',
-        jobFile: 'load-everysize.js'
+        targetTable: 'MREC',
+        items: 10,
+        PK: 'PK',
+        jobFile: 'load-smallitems.js'
     };
 
     const results = await runJob(params);
-    console.log('results:\n');
-    console.log(results);
+
+    console.log('Test ' + params['test'] + ': processed ' + params['items']);
+
+    // console.log(results);
 };
 
 void run().then(()=>{

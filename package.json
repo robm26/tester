@@ -1,27 +1,42 @@
 {
-  "name": "tester",
-  "version": "1.0.0",
-  "description": "database tester tool",
-  "type": "module",
-  "main": "index.js",
-  "dependencies": {
-    "@aws-sdk/client-cloudwatch": "^3.53.0",
-    "@aws-sdk/client-dynamodb": "^3.52.0",
-    "@aws-sdk/util-dynamodb": "^3.51.0",
-    "@aws-sdk/client-sts": "^3.449.0",
-    "@aws-sdk/lib-dynamodb": "^3.438.0"
-  },
+  "private": true,
+  "sideEffects": false,
+  "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "remix build",
+    "dev": "remix dev",
+    "start": "remix-serve build",
+    "typecheck": "tsc"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/robm26/tester.git"
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.451.0",
+    "@aws-sdk/client-dynamodb": "^3.431.0",
+    "@aws-sdk/client-s3": "^3.738.0",
+    "@aws-sdk/client-sts": "^3.449.0",
+    "@aws-sdk/lib-dynamodb": "^3.438.0",
+    "@remix-run/css-bundle": "^1.19.3",
+    "@remix-run/node": "^1.19.3",
+    "@remix-run/react": "^1.19.3",
+    "@remix-run/serve": "^1.19.3",
+    "chart.js": "^4.4.0",
+    "chartjs-plugin-annotation": "^3.0.1",
+    "csvtojson": "^2.0.10",
+    "isbot": "^3.6.8",
+    "mysql2": "^3.6.2",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.2.0",
+    "remix-utils": "6.6.0"
   },
-  "author": "robm26@gmail.com",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/robm26/tester/issues"
+  "devDependencies": {
+    "@remix-run/dev": "^1.19.3",
+    "@remix-run/eslint-config": "^1.19.3",
+    "@types/react": "^18.0.35",
+    "@types/react-dom": "^18.0.11",
+    "eslint": "^8.38.0",
+    "typescript": "^5.0.4"
   },
-  "homepage": "https://github.com/robm26/tester#readme"
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }

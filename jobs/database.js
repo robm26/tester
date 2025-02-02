@@ -1,9 +1,26 @@
-import { DynamoDBClient, PutItemCommand, DescribeTableCommand } from "@aws-sdk/client-dynamodb";
-import { ExecuteStatementCommand, DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBClient, DescribeTableCommand } from "@aws-sdk/client-dynamodb";
+import { ExecuteStatementCommand, DynamoDBDocumentClient, PutCommand, GetCommand} from "@aws-sdk/lib-dynamodb";
 
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
+
+
+const runWarm = async (targetTable, PK, SK) => {
+    let key = {}
+    key['PK'] = 'warm';
+    if(SK) {
+        key['SK'] = 'warm';
+    }
+    const command = new GetCommand({
+        TableName: targetTable,
+        Key: key
+    });
+    
+    const response = await docClient.send(command);
+    return response;
+
+};
 
 const runPut = async (targetTable, item) => {
 
@@ -11,7 +28,7 @@ const runPut = async (targetTable, item) => {
     let response;
     let timeStart;
     let timeEnd;
-    let operation = 'put';
+    let operation = 'get';
 
     const input = {
         "Item": item,
@@ -58,9 +75,6 @@ const runPut = async (targetTable, item) => {
 
 };
 
-const runGet = async (key) => {
-
-};
 
 const runPartiQL = async (sql) => {
 
@@ -143,5 +157,5 @@ const runPartiQL = async (sql) => {
 };
 
 
-export { runPut, runGet, runPartiQL};
+export { runPut, runPartiQL, runWarm };
 

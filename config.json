@@ -1,0 +1,9 @@
+{
+    "bucket": "tester-data",
+    
+    "menuitems": [
+        "results",
+        "query",
+        "about"
+    ]
+}
