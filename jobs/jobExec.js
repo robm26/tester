@@ -4,7 +4,7 @@ import { PutObjectCommand, S3Client, S3ServiceException } from "@aws-sdk/client-
 
 import config from '../config.json' with { type: 'json' };
 
-const bucketName = 'tester-data'; // config().bucket;
+const bucketName = config['bucket'];
 
 const experimentResultsRoot = 'public/experiments';
 
@@ -92,17 +92,21 @@ const runJob = async (params) => {
 
             } else {
                 newSecond = true;
+         
                 // we detected a new second. Emit the previous loop's summary with last second's stats
-
+                // console.log('Second : ' + jobSecond-1 + ' requests: ' + rowSummary['velocity']);
+                
                 rowSummary['velocity'] = requestsThisSecond;
 
+                console.log('Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond);
+                
                 if(rowNum > 1) {
                     jobResults.push(rowSummary);
                 }
 
                 requestsThisSecond = 1;
                 previousJobSecond = jobSecond;
-            }
+            }  
 
             const row = job.rowMaker(rowNum);  // ***** crux of the job system
 
@@ -153,6 +157,8 @@ const runJob = async (params) => {
             //
             // jobResults.push(rowSummary);
         }
+        console.log('Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond);
+                
         if(jobSecond === 1) {
             rowSummary['velocity'] = requestsThisSecond;
         }
@@ -182,23 +188,6 @@ const runJob = async (params) => {
     }
     await fs.appendFile( dir + '/data.csv', resultsFileData, 'utf-8', { flag: 'a' } );
 
-    // put folder and file in S3
-
-    const key = 'exp/' + experiment + '/data.csv';
-
-    // const client = new S3Client({});
-    // const command = new PutObjectCommand({
-    //   Bucket: bucketName,
-    //   Key: key,
-    //   Body: resultsFileData,
-    // });
-
-    // try {
-    //     const response = await client.send(command);
-    //     // console.log('HTTP ' + response.$metadata.httpStatusCode + ' for s3://' + bucketName + '/' + key);
-    //   } catch (caught) {
-    //     console.error(JSON.stringify(caught, null, 2));
-    //   }
 
     return jobResults;
 }

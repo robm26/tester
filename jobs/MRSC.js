@@ -5,6 +5,7 @@ import {runJob} from "./jobExec.js";
 import config from '../config.json' with { type: 'json' };
 
 const itemCount = 1000;
+const tableNames = ['MREC', 'MRSC'];
 
 const run = async () => {
     const expName = 'E' + Math.floor(new Date().getTime() / 1000).toString();
@@ -17,15 +18,13 @@ const run = async () => {
         experiment: expName, 
         test: 'Multi Region Eventual Consistency', 
         dbEngine: 'dynamodb',
-        targetTable: 'MREC', items: itemCount, 
+        targetTable: tableNames[0], items: itemCount, 
         PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
         
     };
-   
-    console.log();
 
     results = await runJob(params);
-    console.log('Test ' + params['test'] + ': processed ' + params['items']);
+    console.log('processed: ' + params['items']);
     console.log();
 
     // *************************** Test MRSC ***************************
@@ -34,21 +33,20 @@ const run = async () => {
         experiment: expName, 
         test: 'Multi Region Strong Consistency', 
         dbEngine: 'dynamodb',
-        targetTable: 'MRSC', items: itemCount, 
+        targetTable: tableNames[1], items: itemCount, 
         PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
     };
 
     results = await runJob(params);
-    console.log('Test ' + params['test'] + ': processed ' + params['items']);
+    console.log('processed: ' + params['items']);
     console.log();
 
     // *************************** Upload to S3 ***************************
        // put folder and file in S3
 
         const fileData = await fs.readFile( '../public/experiments/' +  params.experiment + '/data.csv', 'utf-8');
-        console.log('\nfileData:\n' + fileData);
+        // console.log('\nfileData:\n' + fileData);
   
-
         const key = 'exp/' + expName + '/data.csv';
 
         const client = new S3Client({});
@@ -60,7 +58,7 @@ const run = async () => {
 
         try {
             const response = await client.send(command);
-            // console.log('HTTP ' + response.$metadata.httpStatusCode + ' for s3://' + bucketName + '/' + key);
+            console.log('HTTP ' + response.$metadata.httpStatusCode + ' for s3://' + bucketName + '/' + key);
         } catch (caught) {
             console.error(JSON.stringify(caught, null, 2));
         }

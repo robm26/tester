@@ -17,7 +17,7 @@ const run = async () => {
 
     const results = await runJob(params);
 
-    console.log('Test ' + params['test'] + ': processed ' + params['items']);
+    // console.log('Test ' + params['test'] + ': processed ' + params['items']);
 
     // console.log(results);
 };

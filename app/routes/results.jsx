@@ -15,7 +15,7 @@ const experimentResultsRoot = 'public/experiments';
 
 export async function action({ params, request }) {
     const body = await request.formData();
-    
+
     const experimentFolders = await fs.readdir('./' + experimentResultsRoot);
 
     experimentFolders.map((expFolder,index) => {
@@ -61,7 +61,7 @@ export default function Results() {
                 <tbody>
                 <tr><td className={'noJobMsg'}>
                     {data.experimentFolders.length === 0 ? (<div >
-                        Job results will appear here. Click the jobs menu to run a job.
+                        0 results. Run jobs from the command line jobs folder.
                     </div>) : null}
 
                     <table className='jobList'>

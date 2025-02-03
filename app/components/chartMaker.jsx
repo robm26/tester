@@ -7,13 +7,15 @@ import {
     CategoryScale,
     LinearScale,
     PointElement,
+    BarElement,
     LineElement,
     Title,
     Tooltip,
     Legend,
 } from 'chart.js/auto';
 
-import { Line } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
+import { MaxPartSizeExceededError } from "@remix-run/node/dist";
 
 ChartJS.register(
     CategoryScale,
@@ -38,6 +40,13 @@ export function ChartMaker(parms) {
     const annotations = {};
     let latencyStatsRows = [];
     let velocityStatsRows = [];
+    let latencyLimits = {
+        min: 0,
+        max: 0,
+        buckets:[]
+    }
+    let histo = [];
+    let hData;
 
     // split dataset into sections by the (Experiment.test) test value
     let compareValues = Array.from(new Set(params.fileDataObj.map((line) => line['test'])));
@@ -50,12 +59,17 @@ export function ChartMaker(parms) {
                     yAxisLabel = 'client latency';
                     xAxisLabel = 'request number';
                 }
-                return row['test'] === val;
+                return row['test'] === val; 
             }
 
             if(params['measure'] === 'velocity') {
                 yAxisLabel = 'requests per second';
                 xAxisLabel = 'second';
+            }
+
+            if(params['measure'] === 'histogram') {
+                yAxisLabel = 'count';
+                xAxisLabel = 'bucket';
             }
 
             return row['test'] === val && row[params['measure']]; // skip any that don't have the measure (like final velocity)
@@ -72,27 +86,39 @@ export function ChartMaker(parms) {
         };
         latencyStatsRows.push(statsRow);
 
-        let annotation = {
-            type: 'line',
-            borderColor: getBrushColor(index, val),
-            borderDash: [6, 6],
-            borderDashOffset: 0,
-            borderWidth: 3,
+        if(myDataSet.length > 0) {
+            hData = histogram(myDataSet.map((row) => parseInt(row[params.measure])), params['buckets'], params['range']);
+        }
+        if(hData && hData.counts) {
+           
+            histo.push({
+                label: val,
+                data: hData.counts
+            });
+        }
 
-            label: {
-                display: true,
-                padding: 4,
-                content:  val + ' avg ' + parseInt(setStats.avg) + ' ms',
-                position: 'end',
-                backgroundColor: getBrushColor(index, val),
+        // let annotation = {
+        //     type: 'line',
+        //     borderColor: getBrushColor(index, val),
+        //     borderDash: [6, 6],
+        //     borderDashOffset: 0,
+        //     borderWidth: 3,
 
-                xAdjust: 150 * index * -1,
-                yAdjust: 0,
-                z:1
-            },
-            scaleID: 'y',
-            value: setStats.avg
-        };
+        //     label: {
+        //         display: true,
+        //         padding: 4,
+        //         content:  val + ' avg ' + parseInt(setStats.avg) + ' ms',
+        //         position: 'end',
+        //         backgroundColor: getBrushColor(index, val),
+
+        //         xAdjust: 150 * index * -1,
+        //         yAdjust: 0,
+        //         z:1
+        //     },
+        //     scaleID: 'y',
+        //     value: setStats.avg
+        // };
+
         // annotations[annotation.type + '-' + index] = annotation;
 
         return {
@@ -143,28 +169,46 @@ export function ChartMaker(parms) {
             </tbody></table>
     );
 
-    let velocitySummaryTable = (
-        <table className='experimentResultSummaryTable'><thead>
-        <tr><th>name</th><th>table</th><th>avg latency (ms)</th></tr>
-        </thead>
-            <tbody>
-            {latencyStatsRows.map((row, index) => {
-                return (<tr key={index} >
-                    <td>{row.name}</td>
-                    <td>{row.targetTable}</td>
-                    <td>{parseInt(row.avg)}</td>
-                </tr>);
-            })}
-            </tbody></table>
-    );
+    let newChart = null;
+    if(params['chartType'] === 'Histogram') {
+        
+        const options = {
+            responsive: true,
+            plugins: {
+                legend: {position: 'top'},
+                title: {display: true, text: 'Histogram'}
+            },
+            scales: {
+                y: {},
+                x: {}
+            }
+        };
 
-    return (
-        (<div>
+        const data = {
+            labels: hData.buckets,
+            datasets: histo
+        };
+        
+        newChart = (
+            <Bar
+                options={options}
+                data={data} />
+        );
+ 
+    } else {    
+        newChart = (
             <Line
             options={options}
             data={resultsData} />
+        );  
+        
+    }
+
+    return (
+        (<div>
+            {newChart}
             <br/>
-            {params['measure'] === 'latency' ? latencySummaryTable : null}
+            {params['measure'] === 'latency' & params['chartType'] == 'Line' ? latencySummaryTable : null}
         </div>)
     );
 
@@ -172,14 +216,7 @@ export function ChartMaker(parms) {
 
 function getBrushColor(index, val) {
 
-    if(val === 'mysql') {
-        return 'goldenrod';
-    }
-    if(val === 'dynamodb') {
-        return 'dodgerblue';
-    }
-
-    const colorList = ['purple', 'hotpink', 'orange', 'green'];
+    const colorList = ['MediumBlue','dodgerblue', 'yellow', 'green'];
     return colorList[index];
 
 }
@@ -194,4 +231,47 @@ function summarize(arr) {
     }
     return stats;
 
+}
+
+function histogram(arr, buckets, range) {
+    if(!arr || !buckets) {
+        return null;
+    }
+    
+    // console.log('*** histogram for arr: ' + JSON.stringify(arr, null, 2));
+    // console.log('*** histogram for buckets: ' + buckets);
+    // console.log(JSON.stringify(arr['datasets'], null, 2));
+
+    // let max = range || 100;
+    let bucketSize = range / buckets;
+    let bucketList = Array.from(Array(buckets), (e,i)=>  { 
+        return i * (range / buckets);
+    } );
+    console.log('bucketSize: '  + bucketSize);
+    console.log('bucketRange: '  + bucketList);
+
+    const histTracker = {};
+
+    for (const key of bucketList) {
+        histTracker[key] = 0;
+    }
+
+    for (const item of arr) {
+        for (const bucket of bucketList) {
+
+            if(item >= bucket && item < (bucket + bucketSize)) {
+                histTracker[bucket] += 1;
+                break;
+            }
+        }
+    }
+    
+    // console.log('bucketList: ' + JSON.stringify(bucketList, null, 2));
+
+    let myHist = {
+        buckets: bucketList,
+        counts: Object.values(histTracker)
+    };
+    // console.log('myHist: ' + JSON.stringify(myHist, null, 2));
+    return myHist;
 }

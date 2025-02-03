@@ -70,8 +70,19 @@ export const loader = async ({ params, request }) => {
         chartType: 'Line'
     };
 
+    const chartParams3 = {
+        fileDataObj: fileDataObj,
+        measure: 'latency',
+        yAgg: 'max',
+        xAxis: 'bucket',
+        buckets: 40,
+        range: 120, 
+        chartType: 'Histogram'
+    };
+
     allChartParams.push(chartParams1);
     allChartParams.push(chartParams2);
+    allChartParams.push(chartParams3);
 
 
     return {
@@ -119,12 +130,12 @@ export default function Experiment() {
                                 }
                             </ClientOnly>
                             <hr/>
-
                         </div>);
                     })
                 }
 
             </div>
+            <div><pre>{JSON.stringify(data, null, 2)}</pre></div>
         </Form>
     );
 
@@ -140,14 +151,15 @@ export default function Experiment() {
 function Fallback() {
     return <div>Generating Chart</div>;
 }
-function getBrushColor(params) {
-    let color = 'pink';
 
-    if(params?.dbEngine === 'mysql') {
-        color = 'goldenrod';
-    }
-    if(params?.dbEngine === 'dynamodb') {
-        color = 'dodgerblue';
-    }
-    return color;
-}
+// function getBrushColor(params) {
+//     let color = 'pink';
+
+//     if(params?.dbEngine === 'mysql') {
+//         color = 'goldenrod';
+//     }
+//     if(params?.dbEngine === 'dynamodb') {
+//         color = 'dodgerblue';
+//     }
+//     return color;
+// }
