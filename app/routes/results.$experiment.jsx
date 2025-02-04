@@ -3,6 +3,7 @@ import {
     useLoaderData, Form
 }  from "@remix-run/react";
 
+
 import * as fs from 'node:fs/promises';
 import { ClientOnly } from 'remix-utils';
 
@@ -42,13 +43,13 @@ ChartJS.register(
 
 export const loader = async ({ params, request }) => {
 
-    const fileData = await fs.readFile( experimentResultsRoot + '/' +  params.experiment + '/data.csv', 'utf-8');
-    console.log('\nfileData:\n' + fileData);
+    // const fileData = await fs.readFile( experimentResultsRoot + '/' +  params.experiment + '/data.csv', 'utf-8');
+    // console.log('\nfileData:\n' + fileData);
 
     const bucketPath = 'exp/' + params.experiment + '/data.csv';
 
     const s3Data = await getObject(config.bucket, bucketPath);
-    console.log('s3Data:\n' + s3Data);
+    // console.log('s3Data:\n' + s3Data);
 
     const fileDataObj = await csv().fromString(s3Data);
 
@@ -75,8 +76,8 @@ export const loader = async ({ params, request }) => {
         measure: 'latency',
         yAgg: 'max',
         xAxis: 'bucket',
-        buckets: 40,
-        range: 120, 
+        buckets: 60,
+        range: 60, 
         chartType: 'Histogram'
     };
 
@@ -86,7 +87,7 @@ export const loader = async ({ params, request }) => {
 
 
     return {
-        fileData:fileData,
+        fileData:s3Data,
         allChartParams: allChartParams,
         params: params
     };

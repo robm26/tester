@@ -4,7 +4,7 @@ import {runJob} from "./jobExec.js";
 
 import config from '../config.json' with { type: 'json' };
 
-const itemCount = 1000;
+const itemCount = 5000;
 const tableNames = ['MREC', 'MRSC'];
 
 const run = async () => {

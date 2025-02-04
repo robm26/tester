@@ -1,7 +1,7 @@
 import mysql2 from "mysql2/promise";
 import mysql from "mysql2";
 
-import {config} from "./mysql-credentials.mjs";
+// import {config} from "./mysql-credentials.mjs";
 
 import { S3Client, ListObjectsV2Command, S3ServiceException, GetObjectCommand, NoSuchKey } from "@aws-sdk/client-s3";
 
@@ -11,8 +11,8 @@ import {ExecuteStatementCommand, DynamoDBDocumentClient} from "@aws-sdk/lib-dyna
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
-const pool = mysql.createPool(config);
-const mysqlPool = pool.promise();
+// const pool = mysql.createPool(config);
+// const mysqlPool = pool.promise();
 
 const listBucketFolders = async (bucketName) => {
     const s3Client = new S3Client({});
@@ -129,37 +129,7 @@ const runPartiQL = async (sql) => {
 };
 
 const runSql = async (sql) => {
-
-    // let result;
-    // let timeStart;
-    // let timeEnd;
-    // let latency = 0;
-    // let operation = (sql).trim().split(" ")[0].toLowerCase();
-
-    // try {
-
-    //     timeStart = new Date();
-    //     const [rows] = await mysqlPool.query(sql);  // uses a pool connection and auto-releases it
-
-    //     timeEnd = new Date();
-    //     latency = timeEnd - timeStart;
-
-    //     if(Array.isArray(rows)) {
-    //         result = {'Items': rows};
-    //     } else {
-    //         result = rows;
-    //     }
-
-    // }  catch (error) {
-    //     timeEnd = new Date();
-    //     latency = timeEnd - timeStart;
-    //     console.log(JSON.stringify(error, null, 2));
-    //     result = {
-    //         error:error
-    //     };
-    // }
-
-    // return({result:result, latency:latency, operation: operation});
+    return null;
 }
 
 

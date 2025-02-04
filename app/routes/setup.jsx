@@ -5,7 +5,7 @@ import * as fs from 'node:fs/promises';
 import { useActionData, useLoaderData, Form, Link} from "@remix-run/react";
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
 import { DynamoDBClient, DescribeEndpointsCommand, CreateTableCommand, DeleteTableCommand, waitUntilTableExists, waitUntilTableNotExists} from "@aws-sdk/client-dynamodb";
-import { config } from "../components/mysql-credentials.mjs";
+// import { config } from "../components/mysql-credentials.mjs";
 import { runSql } from "../components/database.mjs";
 
 
@@ -160,8 +160,8 @@ export default function Setup() {
     const data = useLoaderData();
     const actionData = useActionData();
 
-    const mySqlHostSegments = config.host.split('.');
-    const mySqlHost = (<span>{mySqlHostSegments.slice(0,2).join('.')}<br/>.{mySqlHostSegments.slice(2).join('.')}</span>);
+    // const mySqlHostSegments = config.host.split('.');
+    // const mySqlHost = (<span>{mySqlHostSegments.slice(0,2).join('.')}<br/>.{mySqlHostSegments.slice(2).join('.')}</span>);
 
     return(
         <div className="rootContainer">
@@ -184,20 +184,7 @@ export default function Setup() {
                 <tr>
                     <td rowSpan='2' >
                         Connection Details
-                        <details>
-                            <summary>
-                                <span className='path'>/app/components/mysql-credentials.mjs</span>
-                            </summary>
-                            <br/>
-                            <table className='mysqlConnectionInfo'>
-                                <tbody>
-                                <tr><td>Host</td><td className='path'>{mySqlHost}</td></tr>
-                                <tr><td>User</td><td>{config.user}</td></tr>
-                                <tr><td>Database</td><td>{config.database}</td></tr>
 
-                                </tbody>
-                            </table>
-                        </details>
                     </td>
                     <td>
                     <table className='jobList'>
