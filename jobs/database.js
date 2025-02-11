@@ -22,13 +22,14 @@ const runWarm = async (targetTable, PK, SK) => {
 
 };
 
+
 const runPut = async (targetTable, item) => {
 
     let latency = 0;
     let response;
     let timeStart;
     let timeEnd;
-    let operation = 'get';
+    let operation = 'put';
 
     const input = {
         "Item": item,
@@ -41,6 +42,65 @@ const runPut = async (targetTable, item) => {
     try {
         timeStart = new Date();
         response = await docClient.send(command);
+        
+    } catch (error) {
+
+        console.error('Error:\n' + JSON.stringify(error, null, 2));
+        timeEnd = new Date();
+        latency = timeEnd - timeStart;
+
+        const errorSummary = {
+            error: {
+                code: error.$metadata.httpStatusCode,
+                name: error.name,
+                // fault: error.$fault,
+                // httpStatusCode: error.$metadata.httpStatusCode,
+                requestId: error.$metadata.requestId,
+                attempts: error.$metadata.attempts,
+                totalRetryDelay: error.$metadata.totalRetryDelay,
+                Item: JSON.stringify(item)
+            },
+            affectedRows: 0
+        };
+        console.error(JSON.stringify(errorSummary, null, 2));
+
+        return({result:errorSummary, latency:latency, operation: operation});
+    }
+
+    timeEnd = new Date();
+    latency = timeEnd - timeStart;
+
+    response['affectedRows'] = 1;
+
+    return({result:response, latency:latency, operation: operation});
+
+};
+
+const runGet = async (targetTable, key, strength) => {
+
+    let latency = 0;
+    let response;
+    let timeStart;
+    let timeEnd;
+    let operation = 'get';
+
+
+    let input = {
+        "Key": key,
+        "ReturnConsumedCapacity": "TOTAL",
+        "TableName": targetTable,
+        "ConsistentRead": strength === 'strong' ? 'True' : 'False'
+    };
+
+
+    const command = new GetCommand(input);
+
+    try {
+        timeStart = new Date();
+        response = await docClient.send(command);
+
+        // console.log('got item ' + JSON.stringify(response, null, 2));
+
         
     } catch (error) {
 
@@ -157,5 +217,5 @@ const runPartiQL = async (sql) => {
 };
 
 
-export { runPut, runPartiQL, runWarm };
+export { runPut, runGet, runWarm };
 

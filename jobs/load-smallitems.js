@@ -1,10 +1,10 @@
-// job to load a lot of small items
+// job to create a lot of small items
 import { payloadData, randomString, randomElement} from './util.js';
 
 const rowMaker = (tick, second) => {
     const tickOffset = tick + 20;
     const newRow = {
-        PK: tick.toString(),
+        PK: 'C-' + tick.toString(),
         SK: '0',
         category: 'cat-' + randomElement(['A', 'B', 'C', 'D', 'E']),
         product: randomString(10),

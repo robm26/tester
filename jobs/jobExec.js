@@ -1,6 +1,5 @@
 import * as fs from 'node:fs/promises';
-import { runPartiQL, runPut, runWarm } from "./database.js";
-import { PutObjectCommand, S3Client, S3ServiceException } from "@aws-sdk/client-s3";
+import { runPut, runGet, runWarm } from "./database.js";
 
 import config from '../config.json' with { type: 'json' };
 
@@ -31,11 +30,14 @@ const runJob = async (params) => {
     console.log('Job parameters:\n' + JSON.stringify(params, null, 2));
     const experiment = params['experiment'];
     const test = params['test'];
-    const dbEngine = params['dbEngine'];
+    const dbEngine = 'dynamodb';
     const targetTable = params['targetTable'];
     const items = params['items'];
     const PK = params['PK'];
     const SK = params['SK'] || null;
+    const operation = params['operation'];
+    const strength = params['strength'] || null;
+    const region = params['region'];
 
     const jobFile = params['jobFile'];
 
@@ -111,33 +113,37 @@ const runJob = async (params) => {
             const row = job.rowMaker(rowNum);  // ***** crux of the job system
 
             const pkValue = row[PK];
+            const skValue = row[SK];
 
             let rowResult;
 
-            const pqlDoubleQuotes = "INSERT INTO " + targetTable + " VALUE " + JSON.stringify(row) + ";";
-            const pql = pqlDoubleQuotes.replaceAll('"', "'");
-
             try {
-                // rowResult = await runPartiQL(pql);
-                rowResult = await runPut(targetTable, row);
+                if(operation === 'put') {
+                    rowResult = await runPut(targetTable, row);
+                }
+                if(operation === 'get') {
+                    const key = {};
+
+                    key[PK] = row[PK];
+                    key[SK] = row[SK];
+
+                    rowResult = await runGet(targetTable, key, strength);
+                }
+                
 
             } catch (err) { 
                 console.error('Error: ' + JSON.stringify(err, null, 2));
             }
-            
-            // console.log('rowResult: ' + JSON.stringify(rowResult, null, 2));
 
             httpStatusCode = rowResult?.result?.$metadata?.httpStatusCode || rowResult?.result?.error?.code;
             attempts = rowResult?.result?.$metadata?.attempts || rowResult?.result?.error?.attempts;
 
-
             rowSummary = {
-                rowNum: rowNum,
-                dbEngine: dbEngine,
+                requestNum: rowNum,
                 experiment: experiment,
                 test: test,
                 jobFile: jobFile,
-                operation: rowResult?.operation,
+                operation: operation,
                 targetTable:targetTable,
                 PK: pkValue,
                 jobTimestamp: jobTimestamp,
@@ -188,6 +194,7 @@ const runJob = async (params) => {
     }
     await fs.appendFile( dir + '/data.csv', resultsFileData, 'utf-8', { flag: 'a' } );
 
+    await fs.appendFile( dir + '/summary.json', resultsFileData, 'utf-8', { flag: 'a' } );
 
     return jobResults;
 }
