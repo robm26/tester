@@ -6,3 +6,4 @@ public/build/
 /build
 .env
 app2/
+.next/

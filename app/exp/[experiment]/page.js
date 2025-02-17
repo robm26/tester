@@ -1,6 +1,6 @@
 
 import css from '@/app/page.module.css';
-import config from '@/app/config.json';
+import config from '@/config.json';
 import { getDatafile } from "@/app/lib/s3.js";
 import { getBrushColor } from "@/app/lib/brushcolor.js";
 import { histogram, calculateLinearRegression, calculateTailLatency, makeStats, makeLinearStats } from "@/app/lib/statistics.js";
@@ -10,6 +10,11 @@ import CsvGrid from '@/app/lib/csvgrid.js';
 import MyChart from '@/app/exp/[experiment]/chart.js';
 
 import {csv} from 'csvtojson';
+
+const histogramConfig = {
+  "buckets": 100,
+  "range": 200
+};
 
 export default async function Page({params}) {
 
@@ -74,7 +79,7 @@ export default async function Page({params}) {
 
 
     if(myDataSet.length > 0) {
-      hData = histogram(myDataSet.map((row) => parseInt(row[yAttribute])), config['buckets'], config['range']);
+      hData = histogram(myDataSet.map((row) => parseInt(row[yAttribute])), histogramConfig['buckets'], histogramConfig['range']);
     }
     if(hData && hData.counts) {
       

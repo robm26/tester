@@ -5,7 +5,7 @@ import {listFolders} from './lib/s3.js';
 import Link from 'next/link';
 import LeftNav from './LeftNav.js';
 
-import config from '@/app/config.json';
+import config from '@/config.json';
 
 const bucketName = config['bucketName'];
 

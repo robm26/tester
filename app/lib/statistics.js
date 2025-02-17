@@ -33,8 +33,6 @@ function histogram(arr, buckets, range) {
 
     let hCounts = Object.values(histTracker);
 
-    console.log(hCounts.toString());
-    console.log(buckets);
     let lastFilledBucket = buckets;
 
     for (let i = 1; i < hCounts.length; i++) {
