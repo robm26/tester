@@ -15,14 +15,17 @@ const CsvGrid = (data) => {
     let gridTableSummary = (
         <span className={css.gridTableSummary}>
 
-            {dataRows.length-1} rows &nbsp; download: &nbsp;&nbsp;
+            {dataRows.length-1} rows &nbsp; 
+            
+            {/* download: &nbsp;&nbsp;
             <a href={'/experiments/' + experiment + '/data.csv'} download={experiment + '-data.csv'}>CSV</a>
              &nbsp;
              &nbsp; 
 
             <a href={'ms-excel:ofe|u|http://localhost:3000/experiments/' + experiment + '/data.csv'}
             download={experiment + '-data.csv'}>Excel</a>
-            &nbsp;
+            &nbsp; */}
+            
             &nbsp; 
 
             <span onClick={() => setVisibility(!visibility)} style={{cursor: 'pointer'}}>
