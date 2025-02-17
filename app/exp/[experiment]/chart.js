@@ -13,6 +13,7 @@ const MyChart = (req)  => {
   let yLabel;
   let titlePre;
 
+
   if(chartType === 'LA') {
     xLabel = summary['xAxisLabel'] + ' (' + summary['xAxisUnits'] + ')';
     yLabel = summary['yAxisLabel'] + ' (' + summary['yAxisUnits'] + ')';

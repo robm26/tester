@@ -1,17 +1,22 @@
-
 import * as fs from 'node:fs/promises';
 import { PutObjectCommand, S3Client, S3ServiceException } from "@aws-sdk/client-s3";
-import {runJob} from "./jobExec.js";
+import {runJob} from "./lib/jobExec.js";
 
 import config from '../config.json' with { type: 'json' };
 
 const tableNames = ['MREC', 'MRSC'];
 
-const args = process.argv.slice(2);
+const args = process.argv;
+const expName = args[1].substring(args[1].lastIndexOf('/')+1);
 
-const operation = args[0] || 'write'; // 'read'
+const expArgs = args.slice(2);
+const itemCount = expArgs.length > 0 ? expArgs[0] : 400;
+const operation = expArgs.length > 1 ? expArgs[1] : 'write';  // or read
+
 
 let summary = {
+    itemCount: itemCount,
+
     desc: 'Correlating item size and request latency for MREC and MRSC modes of DynamoDB Global Tables',
     type: 'Line',
 
@@ -27,9 +32,13 @@ let summary = {
 
     charts: ['LS'], // xy scatter
 
-    itemCount: 400
+    expName: expName,
+    expArgs: expArgs
+
 };
 
+console.log('Experiment Description : ' + summary['desc']);
+console.log();
 
 const run = async () => {
     const expName = 'E' + Math.floor(new Date().getTime() / 1000).toString();
@@ -130,7 +139,7 @@ const run = async () => {
 
         try {
             const response = await client.send(command);
-            console.log('uploaded file: s3://' + config.bucket + '/' + objName);
+            console.log('uploaded file: s3://' + config['bucketName'] + '/' + objName);
             // console.log('HTTP ' + response.$metadata.httpStatusCode + ' for s3://' + bucketName + '/' + key);
         } catch (caught) {  
             console.error(JSON.stringify(caught, null, 2));

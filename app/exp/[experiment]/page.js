@@ -2,10 +2,13 @@
 import css from '@/app/page.module.css';
 import config from '@/app/config.json';
 import { getDatafile } from "@/app/lib/s3.js";
-import { makeGrid, makeStats, makeLinearStats, getBrushColor } from "@/app/lib/grid.js";
-import { histogram, calculateLinearRegression } from "@/app/lib/statistics.js";
+import { getBrushColor } from "@/app/lib/brushcolor.js";
+import { histogram, calculateLinearRegression, calculateTailLatency, makeStats, makeLinearStats } from "@/app/lib/statistics.js";
+
+import CsvGrid from '@/app/lib/csvgrid.js';
 
 import MyChart from '@/app/exp/[experiment]/chart.js';
+
 import {csv} from 'csvtojson';
 
 export default async function Page({params}) {
@@ -18,6 +21,9 @@ export default async function Page({params}) {
   const experiment = (await params).experiment;
   const data = await getDatafile(config['bucketName'], experiment, 'data.csv');
   const summaryText = await getDatafile(config['bucketName'], experiment, 'summary.json');
+  if(!data) {
+    return (<div>Unable to load data for experiment: {experiment}</div>);
+  };
   const summary = JSON.parse(summaryText);
   const yAttribute = summary['yAttribute'];
   const charts = summary['charts'];
@@ -36,6 +42,7 @@ export default async function Page({params}) {
   let count = 0;
   let stats = [];
   let LRs = [];
+  let showGrid = false;
 
   let chartTypes = {
     LA: {type: 'Line'},
@@ -43,6 +50,7 @@ export default async function Page({params}) {
     LS: {type: 'Scatter'}
   };
 
+  
   let dataSets = compareValues.map((val, index) => {
 
     let myDataSet = dataObj.filter((row) => {
@@ -62,6 +70,9 @@ export default async function Page({params}) {
       }
     );
 
+    const p99 = calculateTailLatency(myDataSet.map((row) => parseInt(row[yAttribute])), 99);
+
+
     if(myDataSet.length > 0) {
       hData = histogram(myDataSet.map((row) => parseInt(row[yAttribute])), config['buckets'], config['range']);
     }
@@ -76,7 +87,7 @@ export default async function Page({params}) {
     }
 
     avg = parseInt(sum/count);
-    
+
     labels = Array.from({length: xAxisMax}, (_, i) => i + 1);
 
     if(charts[0] === 'LS') {
@@ -115,39 +126,13 @@ export default async function Page({params}) {
     
     }
 
-   
-
-    if(charts[0] === 'LS') {
-
-      // let xy = myDataSet.map((item, idx) => {
-      //     return [
-      //         parseInt(item[summary['xAttribute']]), 
-      //         parseInt(item[summary['yAttribute']])
-      //       ];
-      // });
-
-      // const myLR = calculateLinearRegression(xy);
-      // const slope = myLR['slope'];
-      // const yIntercept = myLR['yIntercept'];
-
-      // LRs.push({
-      //   test: val,
-      //   action: myDataSet[0]['operation'],
-      //   items: count,
-      //   slope: slope,
-      //   yIntercept: yIntercept
-      // });
-
-    } else {
-      stats.push({
-        test: val,
-        action: myDataSet[0]['operation'],
-        items: count,
-        value: avg
-      });
-    }
-
-
+    stats.push({
+      test: val,
+      action: myDataSet[0]['operation'],
+      items: count,
+      value: avg,
+      p99:p99
+    }); 
 
 
     return {
@@ -181,50 +166,61 @@ export default async function Page({params}) {
 
   // console.log(JSON.stringify(dataSets[0], null, 2));
 
-  const myGrid = makeGrid(data);
+  // const myGrid = makeGrid(data);
 
-  const myStats = makeStats(stats);
+  let myStats;
+
+  if (charts[0] !== 'LS') {
+    myStats = makeStats(stats);
+  }  
 
   let myLRstats;
   if(charts[0] === 'LS') {
     myLRstats = makeLinearStats(LRs);
   }
- 
-    return (
-      <div className={css.chartPanel}>
-        {charts.map((chart, ix) => {
 
-          if(chart === 'LA') {
-            return (<div key={ix}><MyChart data={bundleLA} chartType={chart} /></div>);
-          }
-          
-          if(chart === 'HI') {
-            return (<div key={ix}><MyChart data={bundleHI} chartType={chart} /></div>);
-          }
+  let experimentCommand = 'node ' + summary['expName'];
+  if(summary['expArgs'] !== undefined) {
+    experimentCommand += ' ' + summary['expArgs'].toString().replace(',', ' ');
 
-          if(chart === 'LS') {
-            return (<div key={ix}><MyChart data={bundleLS} chartType={chart} /></div>);
-          }
+  }
 
-        })}
+  return (
+    <div className={css.chartPanel}>
+      <div className={css.expName}>
+        Experiment command: <span className={css.experimentCommand}>{experimentCommand}</span>
 
-        <br/>
+      </div>
 
-        <div>
+      {charts.map((chart, ix) => {
+
+        if(chart === 'LA') {
+          return (<div key={ix}><MyChart data={bundleLA} chartType={chart} /></div>);
+        }
+        
+        if(chart === 'HI') {
+          return (<div key={ix}><MyChart data={bundleHI} chartType={chart} /></div>);
+        }
+
+        if(chart === 'LS') {
+          return (<div key={ix}><MyChart data={bundleLS} chartType={chart} /></div>);
+        }
+
+      })}
+
+      <br/>
+
+      <div>
         {myStats}
         {myLRstats}
-        <br/>
-        </div>
-        <br/><br/>
-        {/* <div>
-          <textarea defaultValue={JSON.stringify(summary,null,2)} ></textarea>
-        </div> */}
-        <br/><br/>
-        <hr/>
-          {myGrid}
-        
       </div>
-    );
+
+      <br/><br/>
+
+      <CsvGrid data={data} />
+        
+    </div>
+  );
     
 }
 

@@ -4,7 +4,7 @@ ENDPOINTURL=https://dynamodb.$REGION.amazonaws.com
 # ENDPOINTURL=http://localhost:8000
 OUTPUT=text
 
-TableList=("MREC" "MRSC" "everysize")
+TableList=("mytable" "MREC" "MRSC" "everysize")
 TableName=""
 
 if [ $# -gt 0 ]

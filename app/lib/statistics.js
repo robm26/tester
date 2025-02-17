@@ -1,5 +1,8 @@
-import config from '@/app/config.json';
+
 import regression from 'regression';
+
+import css from '@/app/page.module.css';
+import { getBrushColor } from "@/app/lib/brushcolor.js";
 
 
 function histogram(arr, buckets, range) {
@@ -7,17 +10,10 @@ function histogram(arr, buckets, range) {
         return null;
     }
     
-    // console.log('*** histogram for arr: ' + JSON.stringify(arr, null, 2));
-    // console.log('*** histogram for buckets: ' + buckets);
-    // console.log(JSON.stringify(arr['datasets'], null, 2));
-
-    // let max = range || 100;
     let bucketSize = range / buckets;
     let bucketList = Array.from(Array(buckets), (e,i)=>  { 
         return i * (range / buckets);
     } );
-    // console.log('bucketSize: '  + bucketSize);
-    // console.log('bucketRange: '  + bucketList);
 
     const histTracker = {};
 
@@ -34,20 +30,32 @@ function histogram(arr, buckets, range) {
             }
         }
     }
-    
-    // console.log('bucketList: ' + JSON.stringify(bucketList, null, 2));
+
+    let hCounts = Object.values(histTracker);
+
+    console.log(hCounts.toString());
+    console.log(buckets);
+    let lastFilledBucket = buckets;
+
+    for (let i = 1; i < hCounts.length; i++) {
+
+        if(hCounts[buckets - i] === 0 ) {
+            lastFilledBucket = buckets - i;
+        } else {
+            break;
+        }
+    }
 
     let myHist = {
-        buckets: bucketList,
-        counts: Object.values(histTracker)
+        buckets: bucketList.slice(0, lastFilledBucket + 1),
+        counts: hCounts.slice(0, lastFilledBucket + 1)
     };
-    // console.log('myHist: ' + JSON.stringify(myHist, null, 2));
+
     return myHist;
 }
 
 const calculateLinearRegression = (xy) => {
     
-    // const result = regression.linear([[0, 1], [32, 67], [12, 79]]);
     const result = regression.linear(xy);
 
     const slope = result.equation[0];
@@ -59,5 +67,94 @@ const calculateLinearRegression = (xy) => {
     }
 }
 
-export {histogram, calculateLinearRegression};
+function calculateTailLatency(data, percentile) {
+    if (!data || data.length === 0) {
+      return null; // Return null for empty or invalid input
+    }
+    if(data.length < percentile) {
+        return null;
+    }
+
+    const pNumber = percentile/100;
+
+    const sortedData = [...data].sort((a, b) => a - b); 
+    const index = Math.ceil(sortedData.length * pNumber) - 1; 
+    
+    return sortedData[index];
+
+}
+
+const makeStats = (stats, options) => {
+    if(!stats || stats.length === 0) {
+        return (<div></div>);
+    }
+    const cols = Object.keys(stats[0]);
+
+    return(<table className={css.statsTable}><thead>
+        <tr>
+            <th>Test</th>
+            <th>Action</th>
+            <th>Items</th>
+            <th>Average latency in ms</th>
+            <th>P99 latency</th>
+     
+        </tr>
+        </thead><tbody>
+            {stats.map((statline, ix) => {
+                let color = getBrushColor(ix);
+                return (<tr key={ix}>
+                    {cols.map((col, ix2) => {
+                        return (<td key={ix2} 
+                            style={ix2 === cols.length - 2 ? {color:color, fontWeight:'bold', fontSize:'larger'} : {}}
+                        >
+                            {statline[col]}
+                            </td>);
+                    })}
+                    </tr>);
+
+            })}
+
+        </tbody>
+    </table>);
+
+}
+
+const makeLinearStats = (stats, options) => {
+
+    const cols = Object.keys(stats[0]);
+    return(<table className={css.statsTable}><thead>
+        <tr>
+            <th>Test</th>
+            <th>Action</th>
+            <th>Items</th>
+            <th>Slope</th>
+            <th>yIntercept</th>
+            <th>Expected Latency in ms</th>
+     
+        </tr>
+        </thead><tbody>
+            {stats.map((statline, ix) => {
+                let color = getBrushColor(ix);
+
+                return (<tr key={ix}>
+                    {cols.map((col, ix2) => {
+                        return (<td key={ix2} 
+                            style={ix2 >= cols.length - 2 ? {color:color, fontWeight:'bold', fontSize:'larger'} : {}}
+                        >
+                            {statline[col]} 
+                            </td>);
+                    })}
+                    <td key={'123'} style={{fontWeight:'bold'}} > ({statline['slope']} * itemSize) + {statline['yIntercept']}</td>
+
+                    </tr>);
+
+            })}
+
+        </tbody>
+    </table>);
+
+}
+
+
+export {histogram, calculateLinearRegression, calculateTailLatency, makeStats, makeLinearStats};
 

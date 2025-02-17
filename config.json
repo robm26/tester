@@ -1,9 +1,3 @@
 {
-    "bucket": "tester-data",
-    
-    "menuitems": [
-        "results",
-        "query",
-        "about"
-    ]
+    "bucketName": "tester-data"
 }

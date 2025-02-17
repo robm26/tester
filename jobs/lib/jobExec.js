@@ -1,33 +1,21 @@
 import * as fs from 'node:fs/promises';
 import { runPut, runGet, runWarm } from "./database.js";
 
-import config from '../config.json' with { type: 'json' };
-
-const bucketName = config['bucket'];
-
 const experimentResultsRoot = 'public/experiments';
 
 const currentPath = process.cwd().split('/');
 const currentFolder = currentPath.slice(-1)[0];
 
-let pathToJobsFolder = './';
+let pathToJobsFolder = '../';
 
 let pathToExperimentsFolder = '../' + experimentResultsRoot + '/';
 if(currentFolder === 'jobs') {
     pathToExperimentsFolder = '../' + experimentResultsRoot + '/';
 }
 
-const args = process.argv;
-
-if(args.length === 3 && args[2] == 'build/index.js') { // live app
-    pathToJobsFolder = '../jobs/';  // npm run dev
-    pathToExperimentsFolder = './' + experimentResultsRoot + '/';
-}
-
-
 const runJob = async (params) => {
 
-    console.log('Job parameters:\n' + JSON.stringify(params, null, 2));
+    const expName = params['expName'] || null;
     const experiment = params['experiment'];
     const test = params['test'];
     const dbEngine = 'dynamodb';
@@ -38,10 +26,13 @@ const runJob = async (params) => {
     const operation = params['operation'];
     const strength = params['strength'] || null;
     const region = params['region'];
+    const conditionalWrite = params['conditionalWrite'] || 'false';
+    
+    console.log('Job parameters :\n' + JSON.stringify(params, null, 2));
 
     const jobFile = params['jobFile'];
 
-    const jobFileNameImport = pathToJobsFolder + jobFile;
+    const jobFileNameImport = pathToJobsFolder + '/rowmaker/' + jobFile;
 
     const job = await import(jobFileNameImport);
     const jobInfo = job.jobInformation();
@@ -66,7 +57,7 @@ const runJob = async (params) => {
     await sleep(msUntilNextSec);
 
     startMs = Date.now();
-    let rowSummary;
+    let rowSummary = {};
     let newSecond = false;
 
     if(jobInfo.jobType.toUpperCase() === 'INSERT') {
@@ -119,7 +110,7 @@ const runJob = async (params) => {
 
             try {
                 if(operation === 'put') {
-                    rowResult = await runPut(targetTable, row);
+                    rowResult = await runPut(targetTable, row, conditionalWrite);
                 }
                 if(operation === 'get') {
                     const key = {};
@@ -163,7 +154,7 @@ const runJob = async (params) => {
             //
             // jobResults.push(rowSummary);
         }
-        console.log('Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond);
+        console.log('Second : ' + (jobSecond) + ' requests: ' + requestsThisSecond);
                 
         if(jobSecond === 1) {
             rowSummary['velocity'] = requestsThisSecond;
@@ -194,7 +185,7 @@ const runJob = async (params) => {
     }
     await fs.appendFile( dir + '/data.csv', resultsFileData, 'utf-8', { flag: 'a' } );
 
-    await fs.appendFile( dir + '/summary.json', resultsFileData, 'utf-8', { flag: 'a' } );
+    // await fs.appendFile( dir + '/summary.json', resultsFileData, 'utf-8', { flag: 'a' } );
 
     return jobResults;
 }

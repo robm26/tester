@@ -1,0 +1,11 @@
+{ "TableName": "mytable",
+  "BillingMode": "PAY_PER_REQUEST",
+  "AttributeDefinitions": [
+    {"AttributeName": "PK", "AttributeType": "S"},
+    {"AttributeName": "SK", "AttributeType": "S"}
+  ],
+  "KeySchema": [
+    {"KeyType": "HASH", "AttributeName": "PK"},
+    {"KeyType": "RANGE", "AttributeName": "SK"}
+  ]
+}

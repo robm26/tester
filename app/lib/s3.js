@@ -1,6 +1,5 @@
 import { S3Client, ListObjectsV2Command, S3ServiceException, GetObjectCommand, NoSuchKey } from "@aws-sdk/client-s3";
 
-
 const listFolders = async (bucketName) => {
 
       const s3Client = new S3Client({});

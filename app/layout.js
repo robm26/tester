@@ -5,7 +5,9 @@ import {listFolders} from './lib/s3.js';
 import Link from 'next/link';
 import LeftNav from './LeftNav.js';
 
-const bucketName = 'tester-data';
+import config from '@/app/config.json';
+
+const bucketName = config['bucketName'];
 
 export const metadata = {
   title: "Tester",
@@ -23,7 +25,9 @@ export default async function RootLayout({ children }) {
           <thead><tr>
             <th colSpan='2'> 
               <Link href="/">tester</Link> &nbsp;&nbsp;&nbsp;
-              <Link href="/about">about</Link>
+              <span>{'s3://' + bucketName + '/exp/'}</span>
+              
+              {/* <Link href="/about">about</Link> */}
               </th>
             </tr></thead>
           <tbody>

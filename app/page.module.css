@@ -11,9 +11,13 @@ html, body {
 .canvas {
     padding:5px; 
     margin:2px;
-    background-color: whitesmoke;
+    background-color: gainsboro;
     border-radius:5px;
+    display: inline-block;
+    vertical-align: top;
+
 }
+
 .leftNavCell {
   vertical-align: top;
 }
@@ -32,26 +36,35 @@ html, body {
 }
 
 .layoutTable {
-  border: 1px solid green;
   padding:5px;
   margin:5px;
   background-color: gainsboro;
   border:none;
   border-radius:5px;
+  width:900px;
 
 }
 
 .layoutTable th {
   font-size:larger;
   padding:5px;
+  padding-left: 15px;
+  padding-right: 25px;
   margin:5px;
   background-color: silver;
   text-align:left;
+
+}
+
+.layoutTable th span {
+  text-decoration:none;
+  font-size:small;
+  float:right;
 }
 
 .layoutTable th a {
   text-decoration:none;
-  color: darkblue;
+  color: blue;
 }
 .layoutTable td a {
   text-decoration:none;
@@ -62,6 +75,7 @@ html, body {
 
   padding:5px;
   margin:5px;
+  vertical-align: top;
 }
 .canvas{ 
   margin:5px
@@ -81,6 +95,7 @@ html, body {
   padding:5px;
 
 }
+
 
 .gridTable {
   border-radius:5px;
@@ -121,13 +136,25 @@ html, body {
 }
 
 .gridTableDiv {
-  height:400px;
+  height:200px;
   width:800px;
   overflow-x:auto;
   font-size: small;
   resize: both;
-  border:1px solid steelblue;  
   border-radius:5px;
+
+}
+
+.gridTableSummary  {
+  font-size:small;
+  margin-left:12px; 
+
+}
+.gridTableSummary  a {  
+  color: slateblue;
+  font-weight:bold;
+  font-size:smaller;
+  margin-right:10px;  
 }
 
 .statsTable {
@@ -144,4 +171,51 @@ html, body {
 
 .statsTable tbody td {
   text-align: center;
+}
+.hello {
+  background-color: Honeydew;
+  padding:20px;
+
+  border-radius: 10px;
+
+}
+.code {
+  font-family:'Courier New', Courier, monospace;
+  font-weight:bold;
+  background-color: white;
+  padding:5px;
+}
+
+.welcomeMsg {
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.csvGridDiv {
+  padding:2px;
+}
+
+.csvGridDiv button {
+  font-size:small;
+  margin:5px; 
+  background-color:lightgrey;
+  border-radius:5px;
+  border:none;
+  width:120px;
+
+}
+.expName {
+
+  color: dimgray;
+  padding:5px;
+  margin-left: 5px;
+  margin-right: 5px;
+
+  border-bottom:1px solid navy;
+
+}
+.experimentCommand {
+  color:black;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight:bold;
 }

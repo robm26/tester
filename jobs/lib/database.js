@@ -1,7 +1,6 @@
 import { DynamoDBClient, DescribeTableCommand } from "@aws-sdk/client-dynamodb";
 import { ExecuteStatementCommand, DynamoDBDocumentClient, PutCommand, GetCommand} from "@aws-sdk/lib-dynamodb";
 
-
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
@@ -23,7 +22,7 @@ const runWarm = async (targetTable, PK, SK) => {
 };
 
 
-const runPut = async (targetTable, item) => {
+const runPut = async (targetTable, item, conditionalWrite) => {
 
     let latency = 0;
     let response;
@@ -37,34 +36,43 @@ const runPut = async (targetTable, item) => {
         "TableName": targetTable
     };
 
-    const command = new PutCommand(input);
 
+    if(conditionalWrite === 'true') {
+        input['ConditionExpression']  = "attribute_exists(PK) AND price > :priceVal";
+        input['ExpressionAttributeValues'] = { ":priceVal": 50 };
+    }
+
+    const command = new PutCommand(input);
+ 
     try {
         timeStart = new Date();
         response = await docClient.send(command);
         
+        
     } catch (error) {
+  
 
-        console.error('Error:\n' + JSON.stringify(error, null, 2));
-        timeEnd = new Date();
-        latency = timeEnd - timeStart;
+            console.error('Error:\n' + JSON.stringify(error, null, 2));
+            timeEnd = new Date();
+            latency = timeEnd - timeStart;
 
-        const errorSummary = {
-            error: {
-                code: error.$metadata.httpStatusCode,
-                name: error.name,
-                // fault: error.$fault,
-                // httpStatusCode: error.$metadata.httpStatusCode,
-                requestId: error.$metadata.requestId,
-                attempts: error.$metadata.attempts,
-                totalRetryDelay: error.$metadata.totalRetryDelay,
-                Item: JSON.stringify(item)
-            },
-            affectedRows: 0
-        };
-        console.error(JSON.stringify(errorSummary, null, 2));
+            const errorSummary = {
+                error: {
+                    code: error.$metadata.httpStatusCode,
+                    name: error.name,
+                    // fault: error.$fault,
+                    // httpStatusCode: error.$metadata.httpStatusCode,
+                    requestId: error.$metadata.requestId,
+                    attempts: error.$metadata.attempts,
+                    totalRetryDelay: error.$metadata.totalRetryDelay,
+                    Item: JSON.stringify(item)
+                },
+                affectedRows: 0
+            };
+            // console.error(JSON.stringify(errorSummary, null, 2));
 
-        return({result:errorSummary, latency:latency, operation: operation});
+            return({result:errorSummary, latency:latency, operation: operation});
+        
     }
 
     timeEnd = new Date();

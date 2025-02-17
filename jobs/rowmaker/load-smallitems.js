@@ -1,5 +1,5 @@
 // job to create a lot of small items
-import { payloadData, randomString, randomElement} from './util.js';
+import { payloadData, randomString, randomElement} from '../lib/util.js';
 
 const rowMaker = (tick, second) => {
     const tickOffset = tick + 20;
@@ -8,7 +8,8 @@ const rowMaker = (tick, second) => {
         SK: '0',
         category: 'cat-' + randomElement(['A', 'B', 'C', 'D', 'E']),
         product: randomString(10),
-        rating: (tick * 2).toString()
+        rating: (tick * 2).toString(),
+        price: 100 + tick
 
     };
     return newRow;
@@ -19,8 +20,8 @@ const jobInformation = () => {
         jobType: 'insert',
         targetTable: 'MREC',
         PK: 'PK',
-        description: 'Load table with many small items',
-        items: 1000
+        conditionalWrite: 'true',
+        description: 'Load table with many small items'
     };
 }
 

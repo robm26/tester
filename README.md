@@ -1,38 +1,29 @@
-# tester
+## tester 
+**HOME** - [Setup](./setup/README.md) - [Jobs](./jobs/README.md) - [Charts](./app/README.md)
 
-### scenario
-The hardest part of a database developer's job may be deciding which set of data structures, access patterns, and database features should be used in order to meet performance and efficiency requirements. A testing framework can help measure how certain parts of a database solution will perform. Like a scientist, a developer can craft and run experiment routines, to quantify the impact of a particular design decison.
+Take DynamoDB for a test drive with this benchmark test suite. Review results in a chart dashboard.
 
 
+## scenario
+You have just been hired as a DynamoDB database developer, congratulations! Your first project will will be to measure the latency of the database with various configurations and access patterns.
+
+
+## tester: 
 This testing framework will allow you to:
 1. Create and run benchmark test routines, such as:
-   * 1000 reads requests
-   * 1000 write requests 
-2. Gather latency statistics from each routine  
-3. Perform analysis showing average and p99 latency 
-4. Compare the results of tests side by side 
+   * 5000 reads requests
+   * 5000 write requests 
+
+2. Collect request latencies in a CSV file, and save to an S3 bucket folder
+3. Perform analysis showing average latency, latency distributions
+4. Run and view charts via custom  web app
+5. See results of multiple tests side by side
 
 ## components
 There are three main components of this solution:
- * A set of job scripts you can run from an bash shell
- * An S3 bucket to store the performance stats from each job
- * A report with charts summarizing the experiment results
-
-## pre-requisites
-* An AWS account
-* A bash environment such as laptop terminal, AWS Cloudshell session, or EC2 host
-* Bash configured to access to DynamoDB and S3
-
-## setup
-
-1. Clone this repository to your laptop or an AWS Cloudshell terminal.
-2. Navigate to the /setup folder and run 
-## jobs
+ * **setup**: New table definitions and setup scripts
+ * **jobs**: Multi-step job definitions that save request latency details to S3
+ * **app**: A custom web app that renders charts of experiment results
 
 
-Each test routine writes test results into a **data.csv** file stored in the /public/experiments folder. 
-
-# charts
-A web app will allow you to browse the 
-
-To install the charting app, 
+Ready? Head over to the [Setup](./setup/README.md) page.
