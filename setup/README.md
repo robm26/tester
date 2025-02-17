@@ -11,14 +11,22 @@ To setup this project, you will need a few DynamoDB tables as targets for the de
 * An AWS account
 * AWS CLI, configured with IAM read/write access to DynamoDB and S3
 
-These setup steps assume you will be deploying to the **us-east-1** region.
 
-## setup
+### environment setup
+1. Open the AWS console and set the region to us-east-1 (N. Virginia)
+2. Open Cloudshell
+
+Set the default region as follows:
+3. Run ```aws configure``` 
+4. Click enter twice. On the third prompt for region, enter ```us-east-1```
+5. Click enter again on the final prompt. 
+
+## tester setup
 
 The two main components, Jobs and App, may be installed in separate locations. Running Jobs from an EC2 host, Cloudshell or Cloud9 session is recommended. You can also run jobs directly from your laptop, however the latency measurements would include a significant delay for the request to make it across the Internet to the AWS resource. 
 
 
-1. Clone this repository to a AWS Cloudshell terminal session.
+1. Within Cloudshell, clone this repository:
 
  ```
  git clone https://github.com/robm26/tester.git
@@ -40,7 +48,7 @@ The two main components, Jobs and App, may be installed in separate locations. R
 
 3. Create an S3 bucket with a unique name, for example:
 ```
-aws s3api create-bucket --bucket tester-bucket-17837
+aws s3api create-bucket --bucket tester-data-17837
 ```
 
 4. Set this bucket name in the configuration file. From the root folder, update the file **config.json** with the name of your new bucket, and click Save.
