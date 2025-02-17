@@ -34,6 +34,7 @@ let summary = {
     charts: ['LA','HI'] // latency simple and histogram
 
 };
+console.log();
 console.log('Experiment Description : ' + summary['desc']);
 console.log();
 
@@ -92,6 +93,7 @@ const run = async () => {
 
     const res2 = await uploader(keySummary, JSON.stringify(summary, null, 2));
 
+    console.log();
 
 };
 

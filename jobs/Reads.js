@@ -34,8 +34,10 @@ let summary = {
     charts: ['LA','HI'] // latency simple and histogram
 
 };
-console.log('Experiment summary :\n' + JSON.stringify(summary, null, 2));
 
+console.log();
+console.log('Experiment Description : ' + summary['desc']);
+console.log();
 
 const run = async () => {
     const expName = 'E' + Math.floor(new Date().getTime() / 1000).toString();
@@ -91,6 +93,8 @@ const run = async () => {
     const res = await uploader(key, fileData);
 
     const res2 = await uploader(keySummary, JSON.stringify(summary, null, 2));
+
+    console.log();
 
 
 };

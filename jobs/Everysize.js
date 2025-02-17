@@ -29,14 +29,14 @@ let summary = {
     yAttribute: 'latency',
 
     operation: operation,
-
-    charts: ['LS'], // xy scatter
-
     expName: expName,
-    expArgs: expArgs
+    expArgs: expArgs,
+
+    charts: ['LS'] // xy scatter
 
 };
 
+console.log();
 console.log('Experiment Description : ' + summary['desc']);
 console.log();
 
@@ -150,6 +150,8 @@ const run = async () => {
     const res = await uploader(key, fileData);
 
     const res2 = await uploader(keySummary, JSON.stringify(summary, null, 2));
+
+    console.log();
 
 }
 
