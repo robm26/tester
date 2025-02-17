@@ -116,42 +116,40 @@ const run = async () => {
         console.log();
     }
 
-    // *************************** Upload to S3 ***************************
-    // put folder and file in S3
-
-    const fileData = await fs.readFile( '../public/experiments/' +  params.experiment + '/data.csv', 'utf-8');
-    // console.log('\nfileData:\n' + fileData);
-
-    const key = 'exp/' + expName + '/data.csv';
-    const keySummary = 'exp/' + expName + '/summary.json';
-
-    const client = new S3Client({});
-    let command = null;
-
-    async function uploader(objName, body) {
-        // console.log('uploader(' + objName + ')');
-
-        command = new PutObjectCommand({
-            Bucket: config.bucket,
-            Key: objName,
-            Body: body,
-        });
-
-        try {
-            const response = await client.send(command);
-            console.log('uploaded file: s3://' + config['bucketName'] + '/' + objName);
-            // console.log('HTTP ' + response.$metadata.httpStatusCode + ' for s3://' + bucketName + '/' + key);
-        } catch (caught) {  
-            console.error(JSON.stringify(caught, null, 2));
+        // *************************** Upload to S3 ***************************
+        // put folder and file in S3
+    
+        const fileData = await fs.readFile( '../public/experiments/' +  params.experiment + '/data.csv', 'utf-8');
+    
+        const key = 'exp/' + expName + '/data.csv';
+        const keySummary = 'exp/' + expName + '/summary.json';
+    
+        const client = new S3Client({});
+        let command = null;
+    
+        async function uploader(objName, body) {
+    
+            command = new PutObjectCommand({
+                Bucket: config['bucketName'],
+                Key: objName,
+                Body: body,
+            });
+    
+            try {
+                const response = await client.send(command);
+                console.log('uploaded s3://' + config['bucketName'] + '/' + objName);
+                // console.log('HTTP ' + response.$metadata.httpStatusCode + ' for s3://' + bucketName + '/' + key);
+            } catch (caught) {
+                console.error(JSON.stringify(caught, null, 2));
+            }
+    
         }
-
-    }
-
-    const res = await uploader(key, fileData);
-
-    const res2 = await uploader(keySummary, JSON.stringify(summary, null, 2));
-
-    console.log();
+    
+        const res = await uploader(key, fileData);
+    
+        const res2 = await uploader(keySummary, JSON.stringify(summary, null, 2));
+    
+        console.log();
 
 }
 
