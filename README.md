@@ -3,6 +3,7 @@
 
 Take DynamoDB for a test drive with this benchmark test suite. Review results in a chart dashboard.
 
+![spash-image](/public/tester1.png)
 
 ## scenario
 You have just been hired as a DynamoDB database developer, congratulations! Your first project will will be to measure the latency of the database with various configurations and access patterns.

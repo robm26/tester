@@ -112,7 +112,7 @@ export default async function Page({params}) {
         test: val,
         action: myDataSet[0]['operation'],
         items: count,
-        slope: slope.toFixed(2),
+        slope: slope.toFixed(3),
         yIntercept: yIntercept.toFixed(1)
       });
       

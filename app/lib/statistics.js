@@ -54,7 +54,10 @@ function histogram(arr, buckets, range) {
 
 const calculateLinearRegression = (xy) => {
     
-    const result = regression.linear(xy);
+    const result = regression.linear(xy, {
+        order: 2, 
+        precision: 3
+    });
 
     const slope = result.equation[0];
     const yIntercept = result.equation[1];
