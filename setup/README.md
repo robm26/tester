@@ -26,7 +26,8 @@ Set the default region as follows:
 The two main components, Jobs and App, may be installed in separate locations. Running Jobs from an EC2 host, Cloudshell or Cloud9 session is recommended. You can also run jobs directly from your laptop, however the latency measurements would include a significant delay for the request to make it across the Internet to the AWS resource. 
 
 
-1. Within Cloudshell, clone this repository:
+### Within CloudShell
+1. Clone this repository:
 
  ```
  git clone https://github.com/robm26/tester.git
@@ -51,27 +52,38 @@ The two main components, Jobs and App, may be installed in separate locations. R
 aws s3api create-bucket --bucket tester-data-17837
 ```
 
-4. Set this bucket name in the configuration file. From the root folder, update the file **config.json** with the name of your new bucket, and click Save.
+4. Set this bucket name in the configuration file by entering your bucket name into the command below.
+```
+echo '{"bucketName": "YOUR_BUCKET_NAME"}' > config.json
+```
 
+### On your local machine / laptop
+1. Set this bucket name in the configuration file. From the root folder, update the file **config.json** with the name of your new bucket, and click Save, or type the following command, changing the bucket name to your unique bucket name.
+```
+echo '{"bucketName": "YOUR_BUCKET_NAME"}' > config.json
+```
 
-5. Install the chart dashboard web app to your laptop. Open a terminal (command) prompt and clone the project repository again. 
+2. Install the chart dashboard web app. Open a terminal (command) prompt and clone the project repository again. 
 
  ```
  git clone https://github.com/robm26/tester.git
  ```
 
-6.  Next, we will install the required dependency modules (these listed in the *package.json* file).
+3.  Next, we will install the required dependency modules (these listed in the *package.json* file).
 ```
 cd tester
 npm install
 ```
 
-7. Launch the web app. This will run a custom [Next.js](https://nextjs.org/) app from your laptop. 
+4. Ensure you have AWS credentials setup in your environment. If you have not done this before, consult the [CLI documentation](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) You will need 
+
+5. Launch the web app. This will run a custom [Next.js](https://nextjs.org/) app from your laptop. 
 ```
 cd app
 npm run dev
 ```
-8. Open a browser and navigate to http://localhost:3000
+
+6. Open a browser and navigate to http://localhost:3000
 
 You should see a web app in your browser called **tester**
 
