@@ -8,6 +8,7 @@ Take DynamoDB for a test drive with this benchmark test suite. Review results in
 ## scenario
 You have just been hired as a DynamoDB database developer, congratulations! Your first project will will be to measure the latency of the database with various configurations and access patterns.
 
+![spash-image_001](/public/tester_001.png)
 
 ## tester: 
 This testing framework will allow you to:
@@ -26,5 +27,6 @@ There are three main components of this solution:
  * **jobs**: Multi-step job definitions that save request latency details to S3
  * **app**: A custom web app that renders charts of experiment results
 
+![spash-image_002](/public/tester_002.png)
 
 Ready? Head over to the [Setup](./setup/README.md) page.

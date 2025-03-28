@@ -23,7 +23,7 @@ Set the default region as follows:
 
 ## tester setup
 
-The two main components, Jobs and App, may be installed in separate locations. Running Jobs from an EC2 host, Cloudshell or Cloud9 session is recommended. You can also run jobs directly from your laptop, however the latency measurements would include a significant delay for the request to make it across the Internet to the AWS resource. 
+The two main components, Jobs and App, should be installed to separate locations. Running Jobs from an EC2 host, Cloudshell or Cloud9 session is recommended. You can also run jobs directly from your laptop, however the latency measurements would include a significant delay for the request to make it across the Internet to the AWS resource. 
 
 
 1. Within Cloudshell, clone this repository:
@@ -51,27 +51,30 @@ The two main components, Jobs and App, may be installed in separate locations. R
 aws s3api create-bucket --bucket tester-data-17837
 ```
 
-4. Set this bucket name in the configuration file. From the root folder, update the file **config.json** with the name of your new bucket, and click Save.
+4. Set this bucket name in the configuration file. From the root folder, open and update the file **config.json** with the name of your new bucket, and click Save.
 
+The server-side component of tester is now set. Let's switch gears and deploy the client App component on your laptop. This webapp, running on localhost:3000, will serve the charts dashboard showing the latency of your tests.
 
-5. Install the chart dashboard web app to your laptop. Open a terminal (command) prompt and clone the project repository again. 
+1. From your laptop, Open a terminal (command) prompt, and clone the project repository again. 
 
  ```
  git clone https://github.com/robm26/tester.git
  ```
-
+   
 6.  Next, we will install the required dependency modules (these listed in the *package.json* file).
 ```
 cd tester
 npm install
 ```
 
-7. Launch the web app. This will run a custom [Next.js](https://nextjs.org/) app from your laptop. 
+7. Set the S3 bucket name again, this time in the client's configuration file. Open and update the file **config.json** with the name of your new bucket, and click Save.
+   
+8. Launch the web app. This will run a custom [Next.js](https://nextjs.org/) app from your laptop. 
 ```
 cd app
 npm run dev
 ```
-8. Open a browser and navigate to http://localhost:3000
+1. Open a browser and navigate to http://localhost:3000
 
 You should see a web app in your browser called **tester**
 
