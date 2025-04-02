@@ -1,4 +1,8 @@
-REGION=us-east-1
+REGION=$AWS_REGION
+
+if [ -z "$REGION" ]; then
+  REGION="us-east-1"
+fi
 
 ENDPOINTURL=https://dynamodb.$REGION.amazonaws.com
 # ENDPOINTURL=http://localhost:8000
