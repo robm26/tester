@@ -13,6 +13,7 @@ if(currentFolder === 'jobs') {
     pathToExperimentsFolder = '../' + experimentResultsRoot + '/';
 }
 
+
 const runJob = async (params) => {
 
     const expName = params['expName'] || null;
@@ -25,7 +26,6 @@ const runJob = async (params) => {
     const SK = params['SK'] || null;
     const operation = params['operation'];
     const strength = params['strength'] || null;
-    const region = params['region'];
     const conditionalWrite = params['conditionalWrite'] || 'false';
     
     console.log('Job parameters :\n' + JSON.stringify(params, null, 2));
@@ -48,7 +48,7 @@ const runJob = async (params) => {
     let jobElapsed = 0;
     let requestsThisSecond = 0;
 
-    const warmed = await runWarm(targetTable, PK, SK);
+    const endpointRegion = await runWarm(targetTable, PK, SK);
 
     let startMs = Date.now();
     const startSec = Math.floor(startMs/1000);
@@ -136,6 +136,7 @@ const runJob = async (params) => {
                 jobFile: jobFile,
                 operation: operation,
                 targetTable:targetTable,
+                region: endpointRegion,
                 PK: pkValue,
                 jobTimestamp: jobTimestamp,
                 jobSecond: jobSecond,

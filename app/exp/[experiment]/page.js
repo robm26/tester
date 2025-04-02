@@ -1,7 +1,7 @@
 
 import css from '@/app/page.module.css';
 import config from '@/config.json';
-import { getDatafile } from "@/app/lib/s3.js";
+import { getDatafile } from "@/app/lib/aws.js";
 import { getBrushColor } from "@/app/lib/brushcolor.js";
 import { histogram, calculateLinearRegression, calculateTailLatency, makeStats, makeLinearStats } from "@/app/lib/statistics.js";
 
@@ -24,6 +24,7 @@ export default async function Page({params}) {
   let overlays = [];
 
   const experiment = (await params).experiment;
+  const eStartTime = (new Date(parseInt(experiment.slice(1)) * 1000)).toISOString();
   const data = await getDatafile(config['bucketName'], experiment, 'data.csv');
   const summaryText = await getDatafile(config['bucketName'], experiment, 'summary.json');
   if(!data) {
@@ -192,23 +193,31 @@ export default async function Page({params}) {
 
   return (
     <div className={css.chartPanel}>
-      <div className={css.expName}>
-        Experiment command: <span className={css.experimentCommand}>{experimentCommand}</span>
 
+      <div className={css.expName}>
+        Job command: <span className={css.experimentCommand}>{experimentCommand}</span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        Region: <span className={css.experimentCommand}>
+                    {dataObj[0]['region']}
+                  </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        Job start: <span className={css.experimentCommand}>
+                  {eStartTime.slice(0, 19).replace('T', ' ')}
+                </span>
       </div>
 
       {charts.map((chart, ix) => {
 
         if(chart === 'LA') {
-          return (<div key={ix}><MyChart data={bundleLA} chartType={chart} /></div>);
+          return (<div key={ix}><br/><MyChart data={bundleLA} chartType={chart} /></div>);
         }
         
         if(chart === 'HI') {
-          return (<div key={ix}><MyChart data={bundleHI} chartType={chart} /></div>);
+          return (<div key={ix}><br/><MyChart data={bundleHI} chartType={chart} /></div>);
         }
 
         if(chart === 'LS') {
-          return (<div key={ix}><MyChart data={bundleLS} chartType={chart} /></div>);
+          return (<div key={ix}><br/><MyChart data={bundleLS} chartType={chart} /></div>);
         }
 
       })}

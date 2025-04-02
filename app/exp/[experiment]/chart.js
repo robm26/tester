@@ -73,7 +73,7 @@ const MyChart = (req)  => {
           color: 'black',
           font: {
             family: 'Arial',
-            size: 14,
+            size: 16,
             weight: 'bold',
           }
         },

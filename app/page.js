@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import css from './page.module.css';
 
 import config from '../config.json' with { type: 'json' };
@@ -13,10 +15,19 @@ export default async function Home() {
 
         <p>Experiment results are listed on the left.</p>
 
-        <ul>
-          <li>Navigate to <b><i><a href="https://github.com/robm26/tester" >github.com/robm26/tester</a></i></b></li>
-          <li>Follow the instructions</li>
-        </ul>
+          <p>Project & instructions at :&nbsp; 
+            <b><i><a href="https://github.com/robm26/tester" target='_blank'>
+            github.com/robm26/tester
+            </a></i></b>
+          </p>
+
+          <Image
+            src="/tester_s02.png"
+            priority={true}
+            width={600}
+            height={390}
+            alt="tester splash image"
+          />
 
       </main>
       <footer className={null}> 

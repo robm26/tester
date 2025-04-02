@@ -1,5 +1,18 @@
 import { S3Client, ListObjectsV2Command, S3ServiceException, GetObjectCommand, NoSuchKey } from "@aws-sdk/client-s3";
 
+import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
+
+import {
+    DynamoDBClient,
+    ListTablesCommand,
+    DescribeTableCommand,
+    ScanCommand,
+    QueryCommand,
+    GetItemCommand
+} from "@aws-sdk/client-dynamodb";
+
+import { DynamoDBStreamsClient, DescribeStreamCommand } from "@aws-sdk/client-dynamodb-streams";
+
 const listFolders = async (bucketName) => {
 
       const s3Client = new S3Client({});
@@ -55,4 +68,19 @@ const getDatafile = async(bucketName, experiment, file) => {
     }   
 }
 
-export {listFolders, getDatafile};
+const getCallerIdentity = async () => {
+    const client = new STSClient({});
+    try {
+        const data = await client.send(new GetCallerIdentityCommand({}));
+        return data;
+    } catch (error) {
+        console.error("Error", error);
+        return null;
+    }
+}
+
+const getTableShardCount = async () => {
+
+}
+
+export {listFolders, getDatafile, getCallerIdentity};

@@ -1,4 +1,4 @@
-import { DynamoDBClient, DescribeTableCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, DescribeTableCommand, ResourceNotFoundException, DescribeEndpointsCommand } from "@aws-sdk/client-dynamodb";
 import { ExecuteStatementCommand, DynamoDBDocumentClient, PutCommand, GetCommand} from "@aws-sdk/lib-dynamodb";
 
 const client = new DynamoDBClient({});
@@ -6,6 +6,11 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 
 const runWarm = async (targetTable, PK, SK) => {
+
+    const myDescribeEndpointsCommand = new DescribeEndpointsCommand({});
+    const myDecResult = await client.send(myDescribeEndpointsCommand);
+    const endpointRegion = myDecResult['Endpoints'][0]['Address'].split('.')[1];
+
     let key = {}
     key['PK'] = 'warm';
     if(SK) {
@@ -15,9 +20,23 @@ const runWarm = async (targetTable, PK, SK) => {
         TableName: targetTable,
         Key: key
     });
-    
-    const response = await docClient.send(command);
-    return response;
+
+    try {
+        const response = await docClient.send(command);
+        return endpointRegion;
+
+        } catch (error) {
+
+            if (error instanceof ResourceNotFoundException) { 
+                console.log('\n *** Error: table not found : ', targetTable, ' in region : ', endpointRegion);
+                console.log('     Be sure to run the jobs/setup.sh script to create required tables.\n');
+                
+            } else {
+                console.error('Error details:', error);
+            }
+            process.exit();
+
+        }
 
 };
 
