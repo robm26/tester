@@ -21,12 +21,6 @@ This testing framework will allow you to:
 4. Run and view charts via custom  web app
 5. See results of multiple tests side by side
 
-## components
-There are three main components of this solution:
- * **setup**: New table definitions and setup scripts
- * **jobs**: Multi-step job definitions that save request latency details to S3
- * **app**: A custom web app that renders charts of experiment results
 
-![spash-image_002](/public/tester_s02.png)
 
 Ready? Head over to the [Setup](./setup/README.md) page.
