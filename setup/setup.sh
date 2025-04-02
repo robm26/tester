@@ -40,16 +40,24 @@ if [ $# -gt 0 ]
 
         if [ $TableName == "MRSC" ] 
         then
+            echo setting table back to On-Demand
+            aws dynamodb update-table --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL --billing-mode PAY_PER_REQUEST
+            
+            aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
+
             echo updating $TableName to add regions
             aws dynamodb update-table \
                 --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL   \
                 --replica-updates '[{"Create": {"RegionName": "us-east-2"}}, {"Create": {"RegionName": "us-west-2"}}]' \
                 --output $OUTPUT --query 'TableDescription.TableStatus' \
                 --multi-region-consistency STRONG  
+            
+            aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
+
+
+            
         fi
-        
-        aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
-    
+
     done
     
 fi
