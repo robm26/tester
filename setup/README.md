@@ -27,7 +27,7 @@ It's also recommended to deploy the App onto your laptop, so that you will have 
 
 
 ### environment setup
-1. Open the AWS console and set the region to us-east-1 (N. Virginia)
+1. Open the AWS console and set the region to us-east-1 (N. Virginia), or your desired region.
 2. Open Cloudshell
 3. Within Cloudshell, clone this repository:
 
