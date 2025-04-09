@@ -14,6 +14,6 @@
     },
     "WarmThroughput": { 
       "ReadUnitsPerSecond": 12000,
-      "WriteUnitsPerSecond": 30000
+      "WriteUnitsPerSecond": 10000
    }
 }

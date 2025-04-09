@@ -13,8 +13,7 @@
       "StreamViewType": "NEW_AND_OLD_IMAGES" 
     },
     "ProvisionedThroughput": {
-      "NumberOfDecreasesToday": 0,
       "ReadCapacityUnits": 5,
-      "WriteCapacityUnits": 30000
+      "WriteCapacityUnits": 10000
     }
 }

@@ -40,26 +40,6 @@ const getDatafile = async(bucketName, experiment, file) => {
         const response = await client.send(command);
         const body = await response.Body.transformToString();
 
-
-// TODO  need to return correcty type, CSV, Obj, JSON, etc
-    // split dataset into sections by the (Experiment.test) test value
-        // if(file === 'summary.json') {
-        //     console.log('sj');
-        // } else {
-        //     console.log('dc');
-        // }
-
-        // const fileDataObj = await csv().fromString(body);
-
-        // let compareValues = Array.from(new Set(params.fileDataObj.map((line) => line['test'])));
-
-        // console.log(typeof fileDataObj);
-        // console.log(JSON.stringify(fileDataObj, null, 2));
-        // console.log(file);
-        // if(file === 'summary.json') {
-        //     return JSON.parse(body);
-
-        // }
         return body;
 
     } catch (error) {

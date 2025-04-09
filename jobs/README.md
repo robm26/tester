@@ -28,8 +28,7 @@ node Reads
 
 5. You may repeat the read or write experiments, each run will create a new folder in the web app. 
 
-
-6. The full set of demo jobs can be run all at once:
+6. Run the full set of demo jobs:
  
 ```
 cd jobs
@@ -38,6 +37,7 @@ chmod +x ./runall.sh
 ```
 
 
+Next, you will deploy a Next.JS app to render latency results in a chart dashboard: [app](../app/README.md)
 
 
 
