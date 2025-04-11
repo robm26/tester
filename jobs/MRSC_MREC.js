@@ -8,7 +8,7 @@ const args = process.argv;
 const expName = args[1].substring(args[1].lastIndexOf('/')+1);
 
 const expArgs = args.slice(2);
-const itemCount = expArgs.length > 0 ? expArgs[0] : 3000;
+const itemCount = expArgs.length > 0 ? expArgs[0] : 100;
 
 const operation = expArgs[1] || 'write';
 
@@ -137,7 +137,6 @@ const run = async () => {
         // results = await runJob(params);
         // console.log('put : ' + params['items']);
         // console.log();
-
 
 
     // *************************** Upload to S3 ***************************

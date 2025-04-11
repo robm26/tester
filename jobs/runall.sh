@@ -1,4 +1,4 @@
-node MRSC
+node MRSC_MREC
 node Everysize 400 write
 node Everysize 400 read
 node Writes 100

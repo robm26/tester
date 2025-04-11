@@ -48,7 +48,13 @@ const runJob = async (params) => {
     let jobElapsed = 0;
     let requestsThisSecond = 0;
 
-    const endpointRegion = await runWarm(targetTable, PK, SK);
+    let region = null;
+
+    if(params['region']) {
+        region = params['region'];
+    } else {
+        region = await runWarm(targetTable, PK, SK);
+    }
 
     let startMs = Date.now();
     const startSec = Math.floor(startMs/1000);
@@ -136,7 +142,7 @@ const runJob = async (params) => {
                 jobFile: jobFile,
                 operation: operation,
                 targetTable:targetTable,
-                region: endpointRegion,
+                region: region,
                 PK: pkValue,
                 jobTimestamp: jobTimestamp,
                 jobSecond: jobSecond,
@@ -148,6 +154,11 @@ const runJob = async (params) => {
                 attempts: attempts,
                 ConsumedCapacity: rowResult?.result?.ConsumedCapacity?.CapacityUnits
             };
+            // if(params['region']) {
+            //     rowSummary['region'] = 'us-east-1';
+            // } else {
+            //     rowSummary['region'] = endpointRegion;
+            // }
 
             // normally, emit request stats after each request.
             // But, we will wait and do it once the next loop begins,

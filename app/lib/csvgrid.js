@@ -17,20 +17,21 @@ const CsvGrid = (data) => {
 
             {dataRows.length-1} rows &nbsp; 
             
-            {/* download: &nbsp;&nbsp;
+            &nbsp; 
+
+            <span onClick={() => setVisibility(!visibility)} style={{cursor: 'pointer'}}>
+                {visibility ? 'Hide' : 'Show'} CSV Grid
+            </span>
+            &nbsp; 
+
+            download: &nbsp;&nbsp;
             <a href={'/experiments/' + experiment + '/data.csv'} download={experiment + '-data.csv'}>CSV</a>
              &nbsp;
              &nbsp; 
 
             <a href={'ms-excel:ofe|u|http://localhost:3000/experiments/' + experiment + '/data.csv'}
             download={experiment + '-data.csv'}>Excel</a>
-            &nbsp; */}
-            
-            &nbsp; 
-
-            <span onClick={() => setVisibility(!visibility)} style={{cursor: 'pointer'}}>
-                {visibility ? 'Hide' : 'Show'} CSV Grid
-            </span>
+            &nbsp;
         </span>
     );
 

@@ -13,14 +13,17 @@ export default async function Home() {
       <main className={css.main}>
         <span className={css.welcomeMsg}>Welcome to tester!</span>
 
-        <p>Experiment results are listed on the left.</p>
+
+          <p>Tester is a simple experiment management tool.</p>
+          <p>Run a job, then refresh this page to see your new results folder on the left.</p>
+          <p>Append one job result to another, with jobs/combineJobs.js</p>
 
           <p>Project & instructions at :&nbsp; 
             <b><i><a href="https://github.com/robm26/tester" target='_blank'>
             github.com/robm26/tester
             </a></i></b>
           </p>
-
+          
           <Image
             src="/tester_s02.png"
             priority={true}

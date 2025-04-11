@@ -232,6 +232,12 @@ export default async function Page({params}) {
       <br/><br/>
 
       <CsvGrid data={data} />
+
+      {/* <br/>S3 summary.json file:<br/> */}
+      <pre>
+        {summaryText}
+      </pre>
+      
         
     </div>
   );

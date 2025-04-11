@@ -1,4 +1,7 @@
 'use client'
+const hideLatency = true;
+
+
 import { Line, Bar, Scatter } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js/auto';
 
@@ -12,12 +15,14 @@ const MyChart = (req)  => {
   let xLabel;
   let yLabel;
   let titlePre;
-
+  let showX = true;
+  let showY = true;
 
   if(chartType === 'LA') {
     xLabel = summary['xAxisLabel'] + ' (' + summary['xAxisUnits'] + ')';
     yLabel = summary['yAxisLabel'] + ' (' + summary['yAxisUnits'] + ')';
     titlePre = 'Requests';
+    showY = true;
   }
 
   if(chartType === 'HI') {
@@ -36,6 +41,9 @@ const MyChart = (req)  => {
     responsive: true,
     scales: {
       y: {
+          ticks: {
+            display: showY 
+          },
           beginAtZero: true,
           title: {
             display: true,
@@ -50,6 +58,9 @@ const MyChart = (req)  => {
           }
         },
         x: {
+          ticks: {
+            display: showX 
+          },
           title: {
             display: true,
             align: 'center',
@@ -69,7 +80,7 @@ const MyChart = (req)  => {
         },
         title: {
           display: true,
-          text: titlePre + ':   ' + data['summary']['desc'],
+          text: [titlePre + ':   ',  data['summary']['desc']],
           color: 'black',
           font: {
             family: 'Arial',
