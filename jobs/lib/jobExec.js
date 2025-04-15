@@ -19,15 +19,16 @@ const runJob = async (params) => {
     const expName = params['expName'] || null;
     const experiment = params['experiment'];
     const test = params['test'];
-    const dbEngine = 'dynamodb';
     const targetTable = params['targetTable'];
     const items = params['items'];
     const PK = params['PK'];
     const SK = params['SK'] || null;
     const operation = params['operation'];
-    const strength = params['strength'] || null;
+    const strength = params['strength'] || null;  // reads: strong or eventual
     const conditionalWrite = params['conditionalWrite'] || 'false';
+    const maxUnitVelocity = params['maxUnitVelocity'] || 1000;
     
+
     console.log('Job parameters :\n' + JSON.stringify(params, null, 2));
 
     const jobFile = params['jobFile'];
@@ -47,6 +48,8 @@ const runJob = async (params) => {
     let jobTimestampMs = 0;
     let jobElapsed = 0;
     let requestsThisSecond = 0;
+    let unitsThisSecond = 0;
+    let unitsTotal = 0;
 
     let region = null;
 
@@ -70,18 +73,35 @@ const runJob = async (params) => {
         const rowLimit = 100000000;
         const loopLimit = Math.min(rowLimit, items);
 
-        for(let rowNum = 1; rowNum <= loopLimit; rowNum++){
+        for(let rowNum = 1; rowNum <= loopLimit; rowNum++){ // **** iteration loop
 
             let httpStatusCode;
             let attempts; // aws sdk retry stat
+            let totalRetryDelay; // aws sdk retry stat
+            let requestId; // aws request identifier
+            let capacityUnits = 0; // DynamoDB consumed capacity units
+            
             const nowNow = Date.now();
             jobTimestamp = Math.floor(nowNow/1000);
             jobTimestampMs = nowNow - (jobTimestamp * 1000);
             jobElapsed = nowNow - startMs;
 
+            // if(unitsThisSecond > maxUnitVelocity) {
+            //     console.log('*****', jobTimestampMs, unitsThisSecond, maxUnitVelocity);
+
+            //     // const sleepTime = Math.floor(1000 - (unitsThisSecond/maxUnitVelocity) * 1000);
+
+            //     // console.log('\n*** too fast! sleeping for ' + (1000 - unitsThisSecond/maxUnitVelocity) + ' ms');
+            //     // await sleep(1000 - unitsThisSecond/maxUnitVelocity);
+
+            // }
+
             nowSec = Math.floor(nowNow/1000);
+
             jobSecond = nowSec - startSec;
+
             if (jobSecond === previousJobSecond) {
+                
                 newSecond = false;
                 requestsThisSecond += 1;
 
@@ -89,21 +109,36 @@ const runJob = async (params) => {
                     jobResults.push(rowSummary); // previous loop's summary here
                 }
 
+                if(unitsThisSecond >= maxUnitVelocity - 1) {
+
+                    const cooldownTime = 1000 - jobTimestampMs;
+
+                    // console.log('***** at ', jobTimestampMs, ', cooldown ', cooldownTime, '  \nunits this second ', unitsThisSecond, ' maxUnitVelocity ', maxUnitVelocity);
+                    
+                    await sleep(cooldownTime);
+
+                    // console.log('\n*** too fast! sleeping for ' + (1000 - unitsThisSecond/maxUnitVelocity) + ' ms');
+                    // await sleep(1000 - unitsThisSecond/maxUnitVelocity);
+    
+                }
+
             } else {
                 newSecond = true;
          
                 // we detected a new second. Emit the previous loop's summary with last second's stats
-                // console.log('Second : ' + jobSecond-1 + ' requests: ' + rowSummary['velocity']);
+                // console.log('Second : ' + jobSecond-1 + ' requests: ' + rowSummary['unitVelocity']);
                 
-                rowSummary['velocity'] = requestsThisSecond;
+                // rowSummary['unitVelocity'] = requestsThisSecond;
 
-                console.log('Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond);
+                console.log('Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond + ', units consumed: ' + unitsThisSecond);
                 
                 if(rowNum > 1) {
                     jobResults.push(rowSummary);
                 }
 
                 requestsThisSecond = 1;
+                unitsThisSecond = 0;
+
                 previousJobSecond = jobSecond;
             }  
 
@@ -117,6 +152,7 @@ const runJob = async (params) => {
             try {
                 if(operation === 'put') {
                     rowResult = await runPut(targetTable, row, conditionalWrite);
+
                 }
                 if(operation === 'get') {
                     const key = {};
@@ -127,13 +163,22 @@ const runJob = async (params) => {
                     rowResult = await runGet(targetTable, key, strength);
                 }
                 
-
             } catch (err) { 
                 console.error('Error: ' + JSON.stringify(err, null, 2));
             }
 
-            httpStatusCode = rowResult?.result?.$metadata?.httpStatusCode || rowResult?.result?.error?.code;
-            attempts = rowResult?.result?.$metadata?.attempts || rowResult?.result?.error?.attempts;
+            const rowMetadata = rowResult?.result?.$metadata || null;
+            const rowMetadataErr = rowResult?.result?.error || null;
+
+            httpStatusCode = rowMetadata.httpStatusCode || rowMetadataErr.code;
+            attempts = rowMetadata.attempts || rowMetadataErr.attempts;
+
+            totalRetryDelay = rowMetadata.totalRetryDelay || rowMetadataErr?.totalRetryDelay;
+            requestId = rowMetadata.requestId || rowMetadataErr?.requestId;
+
+            capacityUnits = rowResult?.result?.ConsumedCapacity?.CapacityUnits;
+
+            unitsThisSecond += capacityUnits;
 
             rowSummary = {
                 requestNum: rowNum,
@@ -149,11 +194,14 @@ const runJob = async (params) => {
                 jobTimestampMs: jobTimestampMs,
                 jobElapsed: jobElapsed,
                 latency: rowResult?.latency,
-                velocity: null,
+                unitVelocity: unitsThisSecond,
                 httpStatusCode: httpStatusCode,
                 attempts: attempts,
-                ConsumedCapacity: rowResult?.result?.ConsumedCapacity?.CapacityUnits
+                ConsumedCapacity: capacityUnits
             };
+
+            // console.log('Row : ' + rowNum + ' : ' + JSON.stringify(rowSummary, null, 2));
+
             // if(params['region']) {
             //     rowSummary['region'] = 'us-east-1';
             // } else {
@@ -165,11 +213,15 @@ const runJob = async (params) => {
             // to see if we can include a complete second summary for a finished second.
             //
             // jobResults.push(rowSummary);
+
         }
-        console.log('Second : ' + (jobSecond) + ' requests: ' + requestsThisSecond);
+
+        // console.log('Second : ' + (jobSecond) + ' requests: ' + requestsThisSecond);
+        console.log('Second : ' + (jobSecond) + ' requests: ' + requestsThisSecond + ', units consumed: ' + unitsThisSecond);
+                
                 
         if(jobSecond === 1) {
-            rowSummary['velocity'] = requestsThisSecond;
+            rowSummary['unitVelocity'] = requestsThisSecond;
         }
         jobResults.push(rowSummary); // final summary
     }
@@ -199,7 +251,9 @@ const runJob = async (params) => {
 
     // await fs.appendFile( dir + '/summary.json', resultsFileData, 'utf-8', { flag: 'a' } );
 
-    return jobResults;
+    return 'ok';
+    // return jobResults;
+    
 }
 
 export {runJob};

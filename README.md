@@ -1,16 +1,36 @@
-## tester 
+## Tester 
 **HOME** - [Setup](./setup/README.md) - [Jobs](./jobs/README.md) - [Charts](./app/README.md)
 
-Take DynamoDB for a test drive with this benchmark test suite. Review results in a chart dashboard.
+Take Amazon DynamoDB for a test drive with this benchmarking solution. Run custom jobs from your application host, review latency summary statistics, and explore performance data via interactive charts.
+
+Compare the results from two similar experiments to see the impact of design choices, such as whether to use DynamoDB 
+[Global Tables](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html) with 
+[Multi-Region Strong Consistency](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/multi-region-strong-consistency-gt.html).
+
 
 ![spash-image](/public/tester_1.png)
 
-## scenario
-You have just been hired as a DynamoDB database developer, congratulations! Your first project will will be to measure the latency of the database with various configurations and access patterns.
+## Scenario
+You, as a database developer, have just taken a new role within a large engineering team. The team has been researching DynamoDB to learn more about its characteristics, and wants to know whether it would meet their application's strict performance requrements, for a possible database migration.
+
+After orientation, your new manager opens their laptop and shows you what they have discovered in the AWS Console's DynamoDB section. A Monitoring tab shows a dashboard of charts that plot the read and write latencies some recent database testing the team had done. 
+
+You pause, with several questions popping into your head. 
+
+### Questions
+How can we see the full round-trip latency an application running on EC2 would observe when making DynamoDB requests across the network?
+
+How can we see results with per-second or per-request granularity?
+
+How could we see the normal distribution of all latencies to understand average and tail latency?
+
+How could we see, in a single chart, the relative performance of various features, request types, request sizes, and regions?
+
+
 
 ![spash-image_001](/public/tester_s01.png)
 
-## tester: 
+## Testing framework: 
 This testing framework will allow you to:
 1. Create and run benchmark test routines, such as:
    * 5000 reads requests

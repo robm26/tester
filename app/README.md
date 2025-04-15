@@ -1,6 +1,6 @@
 # Charts App
 
-[HOME](../README.md) - [Setup](../setup/README.md) -  [Jobs](../jobs/README.md) -  
+[HOME](../README.md) - [Setup](../setup/README.md) -  [Jobs](../jobs/README.md) -  **App**
 
 ## Charts
 The app/exp folder contains chart rendering functions, and use Next.js, chart.js and react-chartjs-2 packages.

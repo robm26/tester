@@ -22,17 +22,20 @@ html, body {
   vertical-align: top;
 }
 .leftNavDiv {
-  padding:3px;
+  padding:5px;
+  background-color: silver;
+  border-radius:3px;
 }
 
 .leftNavLink {
-  background-color: gainsboro;
+  background-color: silver;
   padding:3px;
 }
 .leftNavLinkActive {
-  background-color: lightblue;
+  background-color: gainsboro;
   font-weight:bold;
   padding:3px;
+
 }
 
 .layoutTable {

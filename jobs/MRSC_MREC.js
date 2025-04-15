@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import { PutObjectCommand, S3Client, S3ServiceException } from "@aws-sdk/client-s3";
+import {bucketUploader} from "./lib/s3.js";
 import {runJob} from "./lib/jobExec.js";
 
 import config from '../config.json' with { type: 'json' };
@@ -147,30 +147,8 @@ const run = async () => {
     const key = 'exp/' + expName + '/data.csv';
     const keySummary = 'exp/' + expName + '/summary.json';
 
-    const client = new S3Client({});
-    let command = null;
-
-    async function uploader(objName, body) {
-
-        command = new PutObjectCommand({
-            Bucket: config['bucketName'],
-            Key: objName,
-            Body: body,
-        });
-
-        try {
-            const response = await client.send(command);
-            console.log('uploaded s3://' + config['bucketName'] + '/' + objName);
-            // console.log('HTTP ' + response.$metadata.httpStatusCode + ' for s3://' + bucketName + '/' + key);
-        } catch (caught) {
-            console.error(JSON.stringify(caught, null, 2));
-        }
-
-    }
-
-    const res = await uploader(key, fileData);
-
-    const res2 = await uploader(keySummary, JSON.stringify(summary, null, 2));
+    const res = await bucketUploader(config['bucketName'], key, fileData);
+    const res2 = await bucketUploader(config['bucketName'], keySummary, JSON.stringify(summary, null, 2));
 
     console.log();
 

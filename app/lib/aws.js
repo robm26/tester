@@ -15,7 +15,9 @@ import { DynamoDBStreamsClient, DescribeStreamCommand } from "@aws-sdk/client-dy
 
 const listFolders = async (bucketName) => {
 
-      const s3Client = new S3Client({});
+      const s3Client = new S3Client({
+        followRegionRedirects: true
+      });
       const listParams = { Bucket: bucketName, Prefix: 'exp/', Delimiter: 'i' };  
       let folderList = [];
       try {
@@ -34,7 +36,9 @@ const listFolders = async (bucketName) => {
 
 const getDatafile = async(bucketName, experiment, file) => {
 
-    const client = new S3Client({});
+    const client = new S3Client({
+        followRegionRedirects: true
+    });
     const command = new GetObjectCommand({  Bucket: bucketName, Key: 'exp/' + experiment + '/' + file});
     try {
         const response = await client.send(command);

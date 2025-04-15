@@ -1,6 +1,5 @@
 'use client'
-const hideLatency = true;
-
+const hideLatency = false;
 
 import { Line, Bar, Scatter } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js/auto';
@@ -15,26 +14,48 @@ const MyChart = (req)  => {
   let xLabel;
   let yLabel;
   let titlePre;
+
   let showX = true;
   let showY = true;
+  let showXgrid = true;
+  let showYgrid = true;
+
 
   if(chartType === 'LA') {
     xLabel = summary['xAxisLabel'] + ' (' + summary['xAxisUnits'] + ')';
     yLabel = summary['yAxisLabel'] + ' (' + summary['yAxisUnits'] + ')';
     titlePre = 'Requests';
-    showY = true;
+
+    if(hideLatency) {
+      showY = false;
+      showYgrid = false;
+    }
+
   }
 
   if(chartType === 'HI') {
     xLabel = 'latency bucket';
     yLabel = 'count';
     titlePre = 'Histogram';
+
+    if(hideLatency) {
+      showX = false;
+      showXgrid = false;
+
+    }
+
   }
 
   if(chartType === 'LS') {
     xLabel = 'item size';
     yLabel = 'latency';
     titlePre = 'XY scatter';
+
+    if(hideLatency) {
+
+      showY = false;
+      showYgrid = false;
+    }
   }
 
   let options = {
@@ -43,6 +64,9 @@ const MyChart = (req)  => {
       y: {
           ticks: {
             display: showY 
+          },
+          grid: {
+            display: showYgrid,
           },
           beginAtZero: true,
           title: {
@@ -61,6 +85,9 @@ const MyChart = (req)  => {
           ticks: {
             display: showX 
           },
+          grid: {
+            display: showXgrid,
+          },
           title: {
             display: true,
             align: 'center',
@@ -78,6 +105,7 @@ const MyChart = (req)  => {
         legend: {
           position: 'top',
         },
+
         title: {
           display: true,
           text: [titlePre + ':   ',  data['summary']['desc']],

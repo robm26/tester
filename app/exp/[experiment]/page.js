@@ -197,11 +197,11 @@ export default async function Page({params}) {
       <div className={css.expName}>
         Job command: <span className={css.experimentCommand}>{experimentCommand}</span>
         &nbsp;&nbsp;&nbsp;&nbsp;
-        Region: <span className={css.experimentCommand}>
+        {/* Region: <span className={css.experimentCommand}>
                     {dataObj[0]['region']}
                   </span>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        Job start: <span className={css.experimentCommand}>
+        &nbsp;&nbsp;&nbsp;&nbsp; */}
+        Job start (GMT): <span className={css.experimentCommand}>
                   {eStartTime.slice(0, 19).replace('T', ' ')}
                 </span>
       </div>

@@ -4,43 +4,6 @@ import { ExecuteStatementCommand, DynamoDBDocumentClient, PutCommand, GetCommand
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
-
-const runWarm = async (targetTable, PK, SK) => {
-
-    const myDescribeEndpointsCommand = new DescribeEndpointsCommand({});
-    const myDecResult = await client.send(myDescribeEndpointsCommand);
-    const endpointRegion = myDecResult['Endpoints'][0]['Address'].split('.')[1];
-
-    let key = {}
-    key['PK'] = 'warm';
-    if(SK) {
-        key['SK'] = 'warm';
-    }
-    const command = new GetCommand({
-        TableName: targetTable,
-        Key: key
-    });
-
-    try {
-        const response = await docClient.send(command);
-        return endpointRegion;
-
-        } catch (error) {
-
-            if (error instanceof ResourceNotFoundException) { 
-                console.log('\n *** Error: table not found : ', targetTable, ' in region : ', endpointRegion);
-                console.log('     Be sure to run the jobs/setup.sh script to create required tables.\n');
-                
-            } else {
-                console.error('Error details:', error);
-            }
-            process.exit();
-
-        }
-
-};
-
-
 const runPut = async (targetTable, item, conditionalWrite) => {
 
     let latency = 0;
@@ -66,32 +29,43 @@ const runPut = async (targetTable, item, conditionalWrite) => {
     try {
         timeStart = new Date();
         response = await docClient.send(command);
-        
-        
+
+        // {
+        //     "$metadata": {
+        //       "httpStatusCode": 200,
+        //       "requestId": "UMI39TTBHJ71VBPN2D95N4F363VV4KQNSO5AEMVJF66Q9ASUAAJG",
+        //       "attempts": 1,
+        //       "totalRetryDelay": 0
+        //     },
+        //     "ConsumedCapacity": {
+        //       "CapacityUnits": 1,
+        //       "TableName": "mytable"
+        //     }
+        //   }
+ 
     } catch (error) {
   
+        console.error('Error:\n' + JSON.stringify(error, null, 2));
+        timeEnd = new Date();
+        latency = timeEnd - timeStart;
 
-            console.error('Error:\n' + JSON.stringify(error, null, 2));
-            timeEnd = new Date();
-            latency = timeEnd - timeStart;
+        const errorSummary = {
+            error: {
+                code: error.$metadata.httpStatusCode,
+                name: error.name,
+                // fault: error.$fault,
+                // httpStatusCode: error.$metadata.httpStatusCode,
+                requestId: error.$metadata.requestId,
+                attempts: error.$metadata.attempts,
+                totalRetryDelay: error.$metadata.totalRetryDelay,
+                Item: JSON.stringify(item)
+            },
+            affectedRows: 0
+        };
+        // console.error(JSON.stringify(errorSummary, null, 2));
 
-            const errorSummary = {
-                error: {
-                    code: error.$metadata.httpStatusCode,
-                    name: error.name,
-                    // fault: error.$fault,
-                    // httpStatusCode: error.$metadata.httpStatusCode,
-                    requestId: error.$metadata.requestId,
-                    attempts: error.$metadata.attempts,
-                    totalRetryDelay: error.$metadata.totalRetryDelay,
-                    Item: JSON.stringify(item)
-                },
-                affectedRows: 0
-            };
-            // console.error(JSON.stringify(errorSummary, null, 2));
-
-            return({result:errorSummary, latency:latency, operation: operation});
-        
+        return({result:errorSummary, latency:latency, operation: operation});
+    
     }
 
     timeEnd = new Date();
@@ -118,7 +92,6 @@ const runGet = async (targetTable, key, strength) => {
         "TableName": targetTable,
         "ConsistentRead": strength === 'strong' ? 'True' : 'False'
     };
-
 
     const command = new GetCommand(input);
 
@@ -162,6 +135,40 @@ const runGet = async (targetTable, key, strength) => {
 
 };
 
+const runWarm = async (targetTable, PK, SK) => {
+
+    const myDescribeEndpointsCommand = new DescribeEndpointsCommand({});
+    const myDecResult = await client.send(myDescribeEndpointsCommand);
+    const endpointRegion = myDecResult['Endpoints'][0]['Address'].split('.')[1];
+
+    let key = {}
+    key['PK'] = 'warm';
+    if(SK) {
+        key['SK'] = 'warm';
+    }
+    const command = new GetCommand({
+        TableName: targetTable,
+        Key: key
+    });
+
+    try {
+        const response = await docClient.send(command);
+        return endpointRegion;
+
+        } catch (error) {
+
+            if (error instanceof ResourceNotFoundException) { 
+                console.log('\n *** Error: table not found : ', targetTable, ' in region : ', endpointRegion);
+                console.log('     Be sure to run the jobs/setup.sh script to create required tables.\n');
+                
+            } else {
+                console.error('Error details:', error);
+            }
+            process.exit();
+
+        }
+
+};
 
 const runPartiQL = async (sql) => {
 
