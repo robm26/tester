@@ -2,17 +2,6 @@ import { S3Client, ListObjectsV2Command, S3ServiceException, GetObjectCommand, N
 
 import { STSClient, GetCallerIdentityCommand } from "@aws-sdk/client-sts";
 
-import {
-    DynamoDBClient,
-    ListTablesCommand,
-    DescribeTableCommand,
-    ScanCommand,
-    QueryCommand,
-    GetItemCommand
-} from "@aws-sdk/client-dynamodb";
-
-import { DynamoDBStreamsClient, DescribeStreamCommand } from "@aws-sdk/client-dynamodb-streams";
-
 const listFolders = async (bucketName) => {
 
       const s3Client = new S3Client({
@@ -63,8 +52,5 @@ const getCallerIdentity = async () => {
     }
 }
 
-const getTableShardCount = async () => {
-
-}
 
 export {listFolders, getDatafile, getCallerIdentity};

@@ -18,14 +18,19 @@ After orientation, your new manager opens their laptop and shows you what they h
 You pause, with several questions popping into your head. 
 
 ### Questions
-How can we see the full round-trip latency an application running on EC2 would observe when making DynamoDB requests across the network?
+ * How can we see the full round-trip latency an application running on EC2 would observe when making DynamoDB requests across the network?
 
-How can we see results with per-second or per-request granularity?
+ * How can we see results with per-second or per-request granularity?
 
-How could we see the normal distribution of all latencies to understand average and tail latency?
+ * How could we see the normal distribution of all latencies to understand average and tail latency?
 
-How could we see, in a single chart, the relative performance of various features, request types, request sizes, and regions?
+ * How could we see, in a single chart, the relative performance of various features, request types, request sizes, and regions? 
 
+Example questions when considering DynamoDB Global Tables Multi-Region Strong Consistency:
+
+ * What would be the average latency for an application to perform a 25 KB strongly consistent read?
+
+ * What would be the write latency difference between us-east-1 and us-west-2 when using GT MRSC?
 
 
 ![spash-image_001](/public/tester_s01.png)

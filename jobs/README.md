@@ -24,11 +24,9 @@ node Reads
 
 3. Navigate to the webapp at [http://localhost:3000](http://localhost:3000) and refresh the page. You should see two new folders on the left side of the page. These represent experiment folders. 
 
-4. Click to each experiment folder to review the charts generated.
+4. You may repeat the read or write experiments, each run will create a new folder in the web app. 
 
-5. You may repeat the read or write experiments, each run will create a new folder in the web app. 
-
-6. Run the full set of demo jobs:
+5. Now, run the full set of demo jobs:
  
 ```
 cd jobs
@@ -37,7 +35,7 @@ chmod +x ./runall.sh
 ```
 
 
-Next, you will deploy a Next.JS app to render latency results in a chart dashboard: [app](../app/README.md)
+Next, you will deploy a Next.JS app to render latency results in a chart dashboard: [App](../app/README.md)
 
 
 
