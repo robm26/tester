@@ -9,6 +9,8 @@ const operation = expArgs[0] || 'put'; // put or get
 const targetTable = expArgs[1] || 'mytable';
 const conditionalWrite = expArgs[2] || false;
 
+console.log('Smoke test operation:', operation, 'targetTable', targetTable);
+
 let readStrength = 'eventual';
 
 const primaryKey = {

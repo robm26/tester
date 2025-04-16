@@ -1,7 +1,21 @@
 import { DynamoDBClient, DescribeTableCommand, ResourceNotFoundException, DescribeEndpointsCommand } from "@aws-sdk/client-dynamodb";
 import { ExecuteStatementCommand, DynamoDBDocumentClient, PutCommand, GetCommand} from "@aws-sdk/lib-dynamodb";
 
-const client = new DynamoDBClient({});
+let ddbClientConfig = {};
+
+const trace = false;
+if(trace) {
+    ddbClientConfig = {
+        logger: {
+            ...console,
+            debug(...args) {},
+            trace(...args) {},
+        }
+    }
+}
+
+const client = new DynamoDBClient(ddbClientConfig);
+
 const docClient = DynamoDBDocumentClient.from(client);
 
 const runPut = async (targetTable, item, conditionalWrite) => {
@@ -18,7 +32,6 @@ const runPut = async (targetTable, item, conditionalWrite) => {
         "TableName": targetTable
     };
 
-
     if(conditionalWrite === 'true') {
         input['ConditionExpression']  = "attribute_exists(PK) AND price > :priceVal";
         input['ExpressionAttributeValues'] = { ":priceVal": 50 };
@@ -28,6 +41,7 @@ const runPut = async (targetTable, item, conditionalWrite) => {
  
     try {
         timeStart = new Date();
+
         response = await docClient.send(command);
 
         // {
@@ -71,6 +85,7 @@ const runPut = async (targetTable, item, conditionalWrite) => {
     timeEnd = new Date();
     latency = timeEnd - timeStart;
 
+
     response['affectedRows'] = 1;
 
     return({result:response, latency:latency, operation: operation});
@@ -97,6 +112,7 @@ const runGet = async (targetTable, key, strength) => {
 
     try {
         timeStart = new Date();
+
         response = await docClient.send(command);
 
         // console.log('got item ' + JSON.stringify(response, null, 2));
@@ -128,6 +144,10 @@ const runGet = async (targetTable, key, strength) => {
 
     timeEnd = new Date();
     latency = timeEnd - timeStart;
+
+    console.log('timeStart : ' + timeStart.getTime() );
+    console.log('timeEnd   : ' +  timeEnd.getTime() );
+    // console.log('latency : ' + latency);
 
     response['affectedRows'] = 1;
 
