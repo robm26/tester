@@ -12,7 +12,7 @@ const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
 
 const operation = expArgs[1] || 'write';
 
-const tableNames = ['MREC', 'MRSC'];
+const tableNames = ['MREC', 'MRSC', 'mytable'];
 
 let summary = {
 
@@ -49,14 +49,29 @@ const run = async () => {
 
 
 
-    // // *************************** Test MRSC writes ***************************
+    // // *************************** Test single region table writes ***************************
 
     params = {
         experiment: expName, 
-        test: 'MRSC writes',  
+        test: 'Single table writes',  
         operation: 'put',   
-        targetTable: tableNames[1], items: summary.itemCount, 
+        targetTable: tableNames[2], items: summary.itemCount, 
+        PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js'
+    };
+
+    results = await runJob(params);
+    console.log('put : ' + params['items']);
+    console.log();
+
+    // // *************************** Test single region table conditional writes ***************************
+
+    params = {
+        experiment: expName, 
+        test: 'Single table conditional writes',  
+        operation: 'put',   
+        targetTable: tableNames[2], items: summary.itemCount, 
         PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
+        conditionalWrite: 'true'
     };
 
     results = await runJob(params);
@@ -64,36 +79,50 @@ const run = async () => {
     console.log();
 
 
+    // *************************** Test MREC conditional writes ***************************
+    params = {
+        experiment: expName, 
+        test: 'MREC conditional writes',
+        operation: 'put', 
+        targetTable: tableNames[0], items: summary.itemCount, 
+        PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
+        conditionalWrite: 'true'
+        
+    };
 
-        // *************************** Test MREC conditional writes ***************************
-        params = {
-            experiment: expName, 
-            test: 'MREC conditional writes',
-            operation: 'put', 
-            targetTable: tableNames[0], items: summary.itemCount, 
-            PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
-            conditionalWrite: 'true'
-            
-        };
+    results = await runJob(params);
+    console.log('put : ' + params['items']);
+    console.log();
+
+    // *************************** Test MREC conditional writes ***************************
+    params = {
+        experiment: expName, 
+        test: 'MREC conditional writes',
+        operation: 'put', 
+        targetTable: tableNames[0], items: summary.itemCount, 
+        PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
+        conditionalWrite: 'true'
+        
+    };
+
+    results = await runJob(params);
+    console.log('put : ' + params['items']);
+    console.log();
     
-        results = await runJob(params);
-        console.log('put : ' + params['items']);
-        console.log();
-    
-        // *************************** Test MRSC conditional writes ***************************
-    
-        params = {
-            experiment: expName, 
-            test: 'MRSC conditional writes',  
-            operation: 'put',   
-            targetTable: tableNames[1], items: summary.itemCount, 
-            PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
-            conditionalWrite: 'true'
-        };
-    
-        results = await runJob(params);
-        console.log('put : ' + params['items']);
-        console.log();
+    // *************************** Test MRSC conditional writes ***************************
+
+    params = {
+        experiment: expName, 
+        test: 'MRSC conditional writes',  
+        operation: 'put',   
+        targetTable: tableNames[1], items: summary.itemCount, 
+        PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
+        conditionalWrite: 'true'
+    };
+
+    results = await runJob(params);
+    console.log('put : ' + params['items']);
+    console.log();
 
 
     // *************************** Upload to S3 ***************************
