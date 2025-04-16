@@ -135,7 +135,6 @@ const runJob = async (params) => {
 
                 console.log('Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond + ', units consumed: ' + unitsThisSecond);
 
-
                 if(rowNum > 1) {
                     jobResults.push(rowSummary);
                 }
