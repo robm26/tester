@@ -79,20 +79,6 @@ const run = async () => {
     console.log();
 
 
-    // *************************** Test MREC conditional writes ***************************
-    params = {
-        experiment: expName, 
-        test: 'MREC conditional writes',
-        operation: 'put', 
-        targetTable: tableNames[0], items: summary.itemCount, 
-        PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
-        conditionalWrite: 'true'
-        
-    };
-
-    results = await runJob(params);
-    console.log('put : ' + params['items']);
-    console.log();
 
     // *************************** Test MREC conditional writes ***************************
     params = {
