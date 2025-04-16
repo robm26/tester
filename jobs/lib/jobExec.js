@@ -27,6 +27,7 @@ const runJob = async (params) => {
     const strength = params['strength'] || null;  // reads: strong or eventual
     const conditionalWrite = params['conditionalWrite'] || 'false';
     const maxUnitVelocity = params['maxUnitVelocity'] || 1000;
+    const maxUnitVelocityAdjusted = 0;
     
 
     console.log('Job parameters :\n' + JSON.stringify(params, null, 2));
@@ -73,6 +74,9 @@ const runJob = async (params) => {
         const rowLimit = 100000000;
         const loopLimit = Math.min(rowLimit, items);
 
+        let unitsOver = 0;
+
+
         for(let rowNum = 1; rowNum <= loopLimit; rowNum++){ // **** iteration loop
 
             let httpStatusCode;
@@ -85,6 +89,8 @@ const runJob = async (params) => {
             jobTimestamp = Math.floor(nowNow/1000);
             jobTimestampMs = nowNow - (jobTimestamp * 1000);
             jobElapsed = nowNow - startMs;
+
+            
 
             // if(unitsThisSecond > maxUnitVelocity) {
             //     console.log('*****', jobTimestampMs, unitsThisSecond, maxUnitVelocity);
@@ -109,17 +115,12 @@ const runJob = async (params) => {
                     jobResults.push(rowSummary); // previous loop's summary here
                 }
 
-                if(unitsThisSecond >= maxUnitVelocity - 1) {
-
+                if(unitsThisSecond >= maxUnitVelocity - unitsOver - 1) {
+                    
                     const cooldownTime = 1000 - jobTimestampMs;
 
-                    // console.log('***** at ', jobTimestampMs, ', cooldown ', cooldownTime, '  \nunits this second ', unitsThisSecond, ' maxUnitVelocity ', maxUnitVelocity);
-                    
                     await sleep(cooldownTime);
 
-                    // console.log('\n*** too fast! sleeping for ' + (1000 - unitsThisSecond/maxUnitVelocity) + ' ms');
-                    // await sleep(1000 - unitsThisSecond/maxUnitVelocity);
-    
                 }
 
             } else {
@@ -129,9 +130,12 @@ const runJob = async (params) => {
                 // console.log('Second : ' + jobSecond-1 + ' requests: ' + rowSummary['unitVelocity']);
                 
                 // rowSummary['unitVelocity'] = requestsThisSecond;
+                
+                unitsOver = Math.max(0, unitsThisSecond - maxUnitVelocity);
 
                 console.log('Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond + ', units consumed: ' + unitsThisSecond);
-                
+
+
                 if(rowNum > 1) {
                     jobResults.push(rowSummary);
                 }
@@ -177,6 +181,7 @@ const runJob = async (params) => {
             requestId = rowMetadata.requestId || rowMetadataErr?.requestId;
 
             capacityUnits = rowResult?.result?.ConsumedCapacity?.CapacityUnits;
+
 
             unitsThisSecond += capacityUnits;
 

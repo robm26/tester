@@ -10,13 +10,15 @@ const expName = args[1].substring(args[1].lastIndexOf('/')+1);
 const expArgs = args.slice(2);
 const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
 
-const tableName = 'mytable';
-const operation = 'read';
+const operation = expArgs[1] || 'write';
+
+const tableNames = ['MREC', 'MRSC'];
 
 let summary = {
+
     itemCount: itemCount,
 
-    desc: 'Small item read test, target table mytable',
+    desc: 'Comparing request latency of regular vs conditional writes in MRSC modes of DynamoDB Global Tables',
     type: 'Line',
 
     xAxisLabel: 'request',
@@ -45,23 +47,54 @@ const run = async () => {
     let params;
     let results;
 
-    // *************************** Test small reads ***************************
+
+
+    // // *************************** Test MRSC writes ***************************
+
     params = {
         experiment: expName, 
-        test: 'mytable small reads',
-        operation: 'get', 
-        targetTable: tableName, items: itemCount, 
-        PK: 'PK', 
-        SK: 'SK', 
-        jobFile: 'load-smallitems.js',
-
-        maxUnitVelocity: 100
-        
+        test: 'MRSC writes',  
+        operation: 'put',   
+        targetTable: tableNames[1], items: summary.itemCount, 
+        PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
     };
 
     results = await runJob(params);
+    console.log('put : ' + params['items']);
+    console.log();
+
+
+
+        // *************************** Test MREC conditional writes ***************************
+        params = {
+            experiment: expName, 
+            test: 'MREC conditional writes',
+            operation: 'put', 
+            targetTable: tableNames[0], items: summary.itemCount, 
+            PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
+            conditionalWrite: 'true'
+            
+        };
     
-    console.log('put : ' + params['items'] + '\n');
+        results = await runJob(params);
+        console.log('put : ' + params['items']);
+        console.log();
+    
+        // *************************** Test MRSC conditional writes ***************************
+    
+        params = {
+            experiment: expName, 
+            test: 'MRSC conditional writes',  
+            operation: 'put',   
+            targetTable: tableNames[1], items: summary.itemCount, 
+            PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
+            conditionalWrite: 'true'
+        };
+    
+        results = await runJob(params);
+        console.log('put : ' + params['items']);
+        console.log();
+
 
     // *************************** Upload to S3 ***************************
     // put folder and file in S3
@@ -72,11 +105,9 @@ const run = async () => {
     const keySummary = 'exp/' + expName + '/summary.json';
 
     const res = await bucketUploader(config['bucketName'], key, fileData);
-
     const res2 = await bucketUploader(config['bucketName'], keySummary, JSON.stringify(summary, null, 2));
 
     console.log();
-
 
 };
 

@@ -1,5 +1,5 @@
 'use client'
-const hideLatency = false;
+const hideLatency = true;
 
 import { Line, Bar, Scatter } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js/auto';

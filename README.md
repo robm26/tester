@@ -15,7 +15,7 @@ You, as a database developer, have just taken a new role within a large engineer
 
 After orientation, your new manager opens their laptop and shows you what they have discovered in the AWS Console's DynamoDB section. A Monitoring tab shows a dashboard of charts that plot the read and write latencies some recent database testing the team had done. 
 
-You pause, with several questions popping into your head. 
+You both agree the Cloudwatch charts work well, but it seems they aren't able to show the full latency picture as experienced by the application. This would include the network hop delay, and delay for any retries required, in addition to the DynamoDB request latency.
 
 ### Questions
  * How can we see the full round-trip latency an application running on EC2 would observe when making DynamoDB requests across the network?
@@ -31,6 +31,8 @@ Example questions when considering DynamoDB Global Tables Multi-Region Strong Co
  * What would be the average latency for an application to perform a 25 KB strongly consistent read?
 
  * What would be the write latency difference between us-east-1 and us-west-2 when using GT MRSC?
+ 
+ * Are conditional writes slower than regular MRSC writes?
 
 
 ![spash-image_001](/public/tester_s01.png)
