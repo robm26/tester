@@ -32,13 +32,13 @@ It's also recommended to deploy the App onto your laptop, so that you will have 
  git clone https://github.com/robm26/tester.git
  ```
 
-4. Locate and run the setup script which will create four DynamoDB tables.
+1. Locate and run the setup script which will create an S3 bucket and four DynamoDB tables.
 ```
    cd tester/setup
    chmod +x ./setup.sh
    ./setup.sh
 ```
-
+   
    *Each table has a key schema of PK and SK, and is in On Demand capacity mode. The final two tables are Global Tables.*
 
    * mytable
@@ -46,20 +46,13 @@ It's also recommended to deploy the App onto your laptop, so that you will have 
    * MREC
    * MRSC
 
-5. Create an S3 bucket with a unique name, for example:
-```
-aws s3api create-bucket --bucket tester-data-17837
-```
-
-6. Set this bucket name in the configuration file. From the root folder, open and update the file **config.json** with the name of your new bucket, and click Save.
-
 The server-side component of tester is now set. Let's switch gears and deploy the client App component on your laptop. This webapp will serve the charts dashboard showing the latency of your tests.
 
 ## App Setup
 ### Pre-requisites
 
 * Node.JS v18 or higher
-* AWS CLI, configured with IAM read access to S3 
+* AWS CLI, configured with IAM access to S3 
 
 1. From your laptop, open a terminal (command) prompt, and clone the project repository again. 
 
@@ -72,20 +65,18 @@ The server-side component of tester is now set. Let's switch gears and deploy th
 cd tester
 npm install
 ```
-
-3. Set the S3 bucket name again, this time in the client's configuration file. Open and update the file **config.json** with the name of your new bucket, and click Save.
    
-4. Launch the web app. This will run a custom [Next.js](https://nextjs.org/) app from your laptop. 
+1. Launch the web app. This will run a custom [Next.js](https://nextjs.org/) app from your laptop. 
+   
 ```
 cd app
 npm run dev
 ```
 
-5. Open a browser and navigate to http://localhost:3000
+1. Open a browser and navigate to http://localhost:3000
 
-You should see a web app in your browser called **tester**
+You should see a web app in your browser called **tester** that is configured to point to the same Jobs S3 bucket.
 
-
-Congrats, **tester** is ready for action! 
+**tester** is now ready for action! 
 
 Next, you will run [Jobs](../jobs/README.md)
