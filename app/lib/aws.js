@@ -8,7 +8,7 @@ const listFolders = async (bucketName) => {
         followRegionRedirects: true
       });
       const listParams = { Bucket: bucketName, Prefix: 'exp/', Delimiter: 'i' };  
-      let folderList = [];
+  
       try {
           const data = await s3Client.send(new ListObjectsV2Command(listParams));
           if(!data || !data['Contents'] || data['Contents'].length === 0) {
@@ -18,7 +18,9 @@ const listFolders = async (bucketName) => {
           }
           
       } catch (error) {
-          console.log('Error', error);
+          console.log('Error', error?.name);
+          // console.log(JSON.stringify(error, null, 2));
+          return {error: error?.name};
       }
 
 };

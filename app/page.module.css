@@ -222,3 +222,11 @@ html, body {
   font-family: 'Courier New', Courier, monospace;
   font-weight:bold;
 }
+
+.error {
+  color: red;
+}
+
+.info {
+  color: blue;
+}

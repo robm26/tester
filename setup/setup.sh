@@ -5,8 +5,35 @@ if [ -z "$REGION" ]; then
     echo i.e. run:
     echo export AWS_REGION=us-east-1
     exit
-  REGION="us-east-1"
 fi
+
+AWS_ACCT=$(aws sts get-caller-identity --output text --query 'Account')
+ACCT_HASH=$(printf "%s" $AWS_ACCT |  md5sum)
+
+BUCKET_NAME="tester-"${ACCT_HASH:0:10}
+BUCKET_ARN="arn:aws:s3:$REGION:$AWS_ACCT:$BUCKET_NAME"
+
+echo "Tester Setup: Deploying S3 bucket, tables, and sample data in $REGION for $AWS_ACCT"
+echo
+
+if aws s3api head-bucket --bucket "$BUCKET_NAME" >/dev/null 2>&1; then
+    echo S3 bucket exists 
+    echo $BUCKET_ARN 
+
+else
+
+    echo Creating S3 bucket 
+    aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION >/dev/null 
+    aws s3api wait bucket-exists --bucket $BUCKET_NAME
+    echo $BUCKET_ARN
+
+fi
+
+
+echo "{\n  \"bucketName\": \"$BUCKET_NAME\"\n}" > ../config.json
+echo Set bucket name in config.json
+
+exit
 
 ENDPOINTURL=https://dynamodb.$REGION.amazonaws.com
 # ENDPOINTURL=http://localhost:8000
@@ -23,18 +50,14 @@ fi
 for TableName in "${TableList[@]}"
 do
     echo
-    echo creating $TableName
+    echo Creating $TableName
     aws dynamodb create-table --cli-input-json file://$TableName.json --region $REGION --endpoint-url $ENDPOINTURL --output $OUTPUT --query 'TableDescription.TableArn'
     aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
 
     if [ $TableName == "MREC" ] 
     then
 
-        echo setting table back to On-Demand
-        aws dynamodb update-table --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL --billing-mode PAY_PER_REQUEST --output $OUTPUT --query 'TableDescription.TableStatus' 
-        aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
-
-        echo updating $TableName to add regions
+        echo Updating $TableName to add regions
         aws dynamodb update-table --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL --output $OUTPUT --query 'TableDescription.TableStatus' --cli-input-json  \
             '{"ReplicaUpdates": [ 
                 {"Create": {"RegionName": "us-east-2" }} 
@@ -45,7 +68,16 @@ do
         aws dynamodb update-table --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL --output $OUTPUT --query 'TableDescription.TableStatus' --cli-input-json  \
             '{"ReplicaUpdates": [ 
                 {"Create": {"RegionName": "us-west-2" }} 
-            ]}'              
+            ]}'      
+        
+        aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
+        
+        echo Loading seed data
+        cd ../jobs
+        node Writes 200 MREC
+        cd ../setup
+
+
     fi
 
     if [ $TableName == "MRSC" ] 
@@ -54,11 +86,11 @@ do
         # aws dynamodb update-table --table-name $TableName  --billing-mode PROVISIONED --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=20000    
         # aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
 
-        echo setting table back to On-Demand
+        echo Switching table from Provisioned Capacity to On Demand
         aws dynamodb update-table --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL --billing-mode PAY_PER_REQUEST --output $OUTPUT --query 'TableDescription.TableStatus' 
         aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
 
-        echo updating $TableName to add regions
+        echo Updating $TableName to add regions
 
         aws dynamodb update-table \
             --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL   \
@@ -68,9 +100,17 @@ do
         
         aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
 
+        echo Loading seed data
+        cd ../jobs
+        node Writes 200 MRSC
+        cd ../setup
+
     fi
 
 done
-    
+
+echo Setup complete
+echo
+
 
 

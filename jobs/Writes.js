@@ -10,7 +10,9 @@ const expName = args[1].substring(args[1].lastIndexOf('/')+1);
 const expArgs = args.slice(2);
 const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
 
-const tableName = 'mytable';
+const tableName = expArgs.length > 1 ? expArgs[1] : 'mytable';
+
+// const tableName = 'mytable';
 const operation = 'write';
 
 let summary = {

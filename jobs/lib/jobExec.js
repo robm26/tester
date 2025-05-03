@@ -61,10 +61,21 @@ const runJob = async (params) => {
     }
 
     let startMs = Date.now();
-    const startSec = Math.floor(startMs/1000);
-    const msUntilNextSec = 1000 - (startMs - (startSec * 1000));
+    const startMsDate = new Date(startMs);
 
-    await sleep(msUntilNextSec);
+    const startSec = Math.floor(startMs/1000);
+    const startSeconds = startMsDate.getSeconds();
+    const msUntilNextSec = 1000 - (startMs - (startSec * 1000));
+    const secondsUntilNextMin = 60 - startSeconds - 1;
+    
+    console.log('Pausing for ' + secondsUntilNextMin + ' seconds, to start at the top of a minute');
+
+    await sleep(msUntilNextSec);              // delay to start at the top of a second
+    await sleep(secondsUntilNextMin * 1000);  // delay to start at the top of a minute
+
+    // const nowNow = Date.now();
+    // console.log('starting at nowNow: ');
+    // console.log(new Date(nowNow));
 
     startMs = Date.now();
     let rowSummary = {};

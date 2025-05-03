@@ -48,7 +48,7 @@ const scanDelete = async () => {
 
       }
       if(throttled) {
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         console.log('scanDelete() - resuming');
         throttled = false;
       }

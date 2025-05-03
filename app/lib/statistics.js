@@ -98,6 +98,7 @@ const makeStats = (stats, options) => {
             <th>Items</th>
             <th>Average latency in ms</th>
             <th>P99 latency</th>
+            <th>Max latency</th>
      
         </tr>
         </thead><tbody>
@@ -106,7 +107,7 @@ const makeStats = (stats, options) => {
                 return (<tr key={ix}>
                     {cols.map((col, ix2) => {
                         return (<td key={ix2} 
-                            style={ix2 === cols.length - 2 ? {color:color, fontWeight:'bold', fontSize:'larger'} : {}}
+                            style={ix2 === cols.length - 3 ? {color:color, fontWeight:'bold', fontSize:'larger'} : {}}
                         >
                             {statline[col]}
                             </td>);

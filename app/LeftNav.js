@@ -15,6 +15,8 @@ export default function LeftNav(props) {
 
     return(
     <div className={css.leftNavDiv}>
+        Experiments:
+        <br/><br/>
         {uniqueFolders.map((folder, index) => {
             return (
             <div key={'folder-' + index} className={pathname.slice(5) === folder ? css.leftNavLinkActive :css.leftNavLink}>

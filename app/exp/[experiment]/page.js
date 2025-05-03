@@ -27,9 +27,11 @@ export default async function Page({params}) {
   const eStartTime = (new Date(parseInt(experiment.slice(1)) * 1000)).toISOString();
   const data = await getDatafile(config['bucketName'], experiment, 'data.csv');
   const summaryText = await getDatafile(config['bucketName'], experiment, 'summary.json');
+
   if(!data) {
     return (<div>Unable to load data for experiment: {experiment}</div>);
   };
+  
   const summary = JSON.parse(summaryText);
   const yAttribute = summary['yAttribute'];
   const charts = summary['charts'];
@@ -45,6 +47,7 @@ export default async function Page({params}) {
   let labels = [];
   let sum = 0;
   let avg = 0;
+  let max = 0;
   let count = 0;
   let stats = [];
   let LRs = [];
@@ -68,11 +71,15 @@ export default async function Page({params}) {
     }
 
     sum = 0;
+    max = 0;
 
     myDataSet.map((item, idx) => 
       {
         sum += parseInt(item[yAttribute]);
         count = idx + 1;
+        if (parseInt(item[yAttribute]) > max) {
+          max = parseInt(item[yAttribute]);
+        }
       }
     );
 
@@ -137,7 +144,8 @@ export default async function Page({params}) {
       action: myDataSet[0]['operation'],
       items: count,
       value: avg,
-      p99:p99
+      p99:p99,
+      max: max
     }); 
 
 

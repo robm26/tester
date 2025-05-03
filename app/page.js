@@ -16,7 +16,7 @@ export default async function Home() {
 
           <p>Tester is a simple experiment management tool.</p>
           <p>Run a job, then refresh this page to see your new results folder on the left.</p>
-          <p>Append one job result to another, with jobs/combineJobs.js</p>
+
 
           <p>Project & instructions at :&nbsp; 
             <b><i><a href="https://github.com/robm26/tester" target='_blank'>
