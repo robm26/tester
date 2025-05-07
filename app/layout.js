@@ -30,6 +30,9 @@ export const metadata = {
   description: "Database Test Results Dashboard",
 };
 
+export const revalidate = 0;
+
+
 export default async function RootLayout({ children }) {
 
   // const myCI = await getCallerIdentity();
@@ -60,9 +63,6 @@ export default async function RootLayout({ children }) {
     }
     
   }
-
- 
-
 
   return (
     <html lang="en">

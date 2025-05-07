@@ -18,7 +18,7 @@ const operation = 'write';
 let summary = {
     itemCount: itemCount,
 
-    desc: 'Small item write test, target table mytable',
+    desc: 'Small item writes and reads',
     type: 'Line',
 
     xAxisLabel: 'request',
@@ -65,6 +65,28 @@ const run = async () => {
     results = await runJob(params);
     
     console.log('\nput : ' + params['items'] + '\n');
+
+    // *************************** Test small reads ***************************
+    
+    params = {
+        experiment: expName, 
+        test: 'mytable small reads',
+        operation: 'get', 
+        targetTable: tableName, 
+        items: itemCount, 
+        PK: 'PK', 
+        SK: 'SK', 
+        jobFile: 'load-smallitems.js',
+
+        maxUnitVelocity: 100
+
+    };
+
+    results = await runJob(params);
+    
+    console.log('\nput : ' + params['items'] + '\n');
+
+
 
     const fileData = await fs.readFile( '../public/experiments/' +  params.experiment + '/data.csv', 'utf-8');
 

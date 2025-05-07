@@ -3,7 +3,7 @@ import css from '@/app/page.module.css';
 import config from '@/config.json';
 import { getDatafile } from "@/app/lib/aws.js";
 import { getBrushColor } from "@/app/lib/brushcolor.js";
-import { histogram, calculateLinearRegression, calculateTailLatency, makeStats, makeLinearStats } from "@/app/lib/statistics.js";
+import { histogram, calculateLinearRegression, calculateTailLatency, makeStats, makeLinearStats, clientVsCwLatencySummary } from "@/app/lib/statistics.js";
 
 import CsvGrid from '@/app/lib/csvgrid.js';
 
@@ -48,6 +48,9 @@ export default async function Page({params}) {
   let sum = 0;
   let avg = 0;
   let max = 0;
+  let min = 0;
+  let setStartTime;
+  let setEndTime;
   let count = 0;
   let stats = [];
   let LRs = [];
@@ -56,7 +59,8 @@ export default async function Page({params}) {
   let chartTypes = {
     LA: {type: 'Line'},
     HI: {type: 'Bar'},
-    LS: {type: 'Scatter'}
+    LS: {type: 'Scatter'},
+    CW: {type: 'Bar'} 
   };
 
   
@@ -72,14 +76,28 @@ export default async function Page({params}) {
 
     sum = 0;
     max = 0;
+    min = 10000;
+
 
     myDataSet.map((item, idx) => 
       {
+        if(idx === 0) {
+          setStartTime = item['jobTimestamp'];
+        }
+        if(idx === myDataSet.length - 1) {
+          setEndTime = item['jobTimestamp'];
+        }
         sum += parseInt(item[yAttribute]);
         count = idx + 1;
+
         if (parseInt(item[yAttribute]) > max) {
           max = parseInt(item[yAttribute]);
         }
+
+        if (parseInt(item[yAttribute]) < min) {
+          min = parseInt(item[yAttribute]);
+        }
+
       }
     );
 
@@ -143,9 +161,15 @@ export default async function Page({params}) {
       test: val,
       action: myDataSet[0]['operation'],
       items: count,
-      value: avg,
+      account: '1234',
+      table: myDataSet[0]['targetTable'],
+      region: myDataSet[0]['region'],
+      setStartTime:  setStartTime,
+      setEndTime: setEndTime,
+      avg: avg,
       p99:p99,
-      max: max
+      max: max,
+      min: min
     }); 
 
 
@@ -158,7 +182,6 @@ export default async function Page({params}) {
     };
 
   });
-
 
   let bundleHI = {
     labels: hData.buckets,
@@ -176,16 +199,18 @@ export default async function Page({params}) {
     labels: labels,
     datasets: [...overlays, ...dataSets],
     summary: summary
-  };      
+  };     
+  
 
   // console.log(JSON.stringify(dataSets[0], null, 2));
-
   // const myGrid = makeGrid(data);
 
   let myStats;
+  let myClientVsCwLatencySummary;
 
   if (charts[0] !== 'LS') {
     myStats = makeStats(stats);
+    myClientVsCwLatencySummary = clientVsCwLatencySummary(stats, summary);
   }  
 
   let myLRstats;
@@ -233,7 +258,8 @@ export default async function Page({params}) {
       <br/>
 
       <div>
-        {myStats}
+
+        {myClientVsCwLatencySummary}
         {myLRstats}
       </div>
 
@@ -243,15 +269,10 @@ export default async function Page({params}) {
 
       {/* <br/>S3 summary.json file:<br/> */}
       <pre>
-        {summaryText}
+        {/* {summaryText} */}
       </pre>
       
-        
     </div>
   );
     
 }
-
-
-
-

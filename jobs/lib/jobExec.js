@@ -39,7 +39,7 @@ const runJob = async (params) => {
     const job = await import(jobFileNameImport);
     const jobInfo = job.jobInformation();
     const jobResults = [];
-    let nowMs;
+
     let nowSec;
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -54,24 +54,29 @@ const runJob = async (params) => {
 
     let region = null;
 
-    if(params['region']) {
-        region = params['region'];
-    } else {
-        region = await runWarm(targetTable, PK, SK);
-    }
+    region = await runWarm(targetTable, PK, SK);
+
+    // if(params['region']) {
+    //     region = params['region'];
+    // } else {
+    //     region = await runWarm(targetTable, PK, SK);
+    // }
 
     let startMs = Date.now();
     const startMsDate = new Date(startMs);
 
-    const startSec = Math.floor(startMs/1000);
-    const startSeconds = startMsDate.getSeconds();
+    let startSec = Math.floor(startMs/1000);
+    let startSeconds = startMsDate.getSeconds();
+
     const msUntilNextSec = 1000 - (startMs - (startSec * 1000));
-    const secondsUntilNextMin = 60 - startSeconds - 1;
+    const secondsUntilNextMin = 60 - startSeconds;
     
     console.log('Pausing for ' + secondsUntilNextMin + ' seconds, to start at the top of a minute');
 
     await sleep(msUntilNextSec);              // delay to start at the top of a second
     await sleep(secondsUntilNextMin * 1000);  // delay to start at the top of a minute
+
+    startSec += secondsUntilNextMin; 
 
     // const nowNow = Date.now();
     // console.log('starting at nowNow: ');
@@ -87,7 +92,6 @@ const runJob = async (params) => {
 
         let unitsOver = 0;
 
-
         for(let rowNum = 1; rowNum <= loopLimit; rowNum++){ // **** iteration loop
 
             let httpStatusCode;
@@ -101,8 +105,7 @@ const runJob = async (params) => {
             jobTimestampMs = nowNow - (jobTimestamp * 1000);
             jobElapsed = nowNow - startMs;
 
-            
-
+        
             // if(unitsThisSecond > maxUnitVelocity) {
             //     console.log('*****', jobTimestampMs, unitsThisSecond, maxUnitVelocity);
 
@@ -143,8 +146,8 @@ const runJob = async (params) => {
                 // rowSummary['unitVelocity'] = requestsThisSecond;
                 
                 unitsOver = Math.max(0, unitsThisSecond - maxUnitVelocity);
-
-                console.log('Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond + ', units consumed: ' + unitsThisSecond);
+                const rightNow = new Date();
+                console.log(rightNow.toISOString() +  '  Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond + ', units consumed: ' + unitsThisSecond);
 
                 if(rowNum > 1) {
                     jobResults.push(rowSummary);

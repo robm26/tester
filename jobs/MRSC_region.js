@@ -56,7 +56,8 @@ const run = async () => {
         experiment: expName, 
         test: 'MRSC writes ' + region,  
         operation: 'put',   
-        targetTable: tableNames[1], items: summary.itemCount, 
+        targetTable: tableNames[1], 
+        items: summary.itemCount, 
         PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
     };
 
@@ -72,7 +73,8 @@ const run = async () => {
         test: 'MRSC strong reads ' + region, 
         operation: 'get',
         strength: 'strong', 
-        targetTable: tableNames[1], items: summary.itemCount, 
+        targetTable: tableNames[1], 
+        items: summary.itemCount, 
         PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
     };
 

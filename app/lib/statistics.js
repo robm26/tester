@@ -1,8 +1,10 @@
 
 import regression from 'regression';
-
 import css from '@/app/page.module.css';
 import { getBrushColor } from "@/app/lib/brushcolor.js";
+
+import {getCwStats} from './aws.js';
+import MyChart from '@/app/exp/[experiment]/chart.js';
 
 
 function histogram(arr, buckets, range) {
@@ -50,7 +52,7 @@ function histogram(arr, buckets, range) {
     };
 
     return myHist;
-}
+};
 
 const calculateLinearRegression = (xy) => {
     
@@ -66,7 +68,7 @@ const calculateLinearRegression = (xy) => {
         slope: slope,
         yIntercept: yIntercept
     }
-}
+};
 
 function calculateTailLatency(data, percentile) {
     if (!data || data.length === 0) {
@@ -83,7 +85,258 @@ function calculateTailLatency(data, percentile) {
     
     return sortedData[index];
 
-}
+};
+
+const clientVsCwLatencySummary = async (stats, summary) => {
+    if(!stats || stats.length === 0) {
+        return (<div></div>);
+    }
+
+    // console.log('clientVsCwLatency');
+    // console.log(JSON.stringify(stats,null, 2));
+
+    const fullStats = [];
+
+    for (const statline of stats) {
+
+        let operation;
+        if(statline['action'] === 'get') {
+            operation = 'GetItem';
+        } else {
+            if(statline['action'] === 'put') {
+                operation = 'PutItem';
+            } else {
+                operation = statline['action'];
+            }
+        } 
+
+        let st = parseInt(statline['setStartTime']);
+        let et = parseInt(statline['setEndTime']);
+    
+        st = roundDateToMinute(st, 'down');
+        et = roundDateToMinute(et, 'up');
+
+        const params = {
+            TableName: statline['table'],
+            operation: operation,
+            StartTime: st,
+            EndTime:   et,
+            region:    statline['region']
+        };
+
+        const result = await getCwStats(params);
+        const cwAvgLatency = result['MetricDataResults'].filter((mdr)=> mdr['Id'] === 'avg')[0]['Values'][0];
+        const cwMinLatency = result['MetricDataResults'].filter((mdr)=> mdr['Id'] === 'min')[0]['Values'][0];
+        const cwMaxLatency = result['MetricDataResults'].filter((mdr)=> mdr['Id'] === 'max')[0]['Values'][0];
+
+        const roundNum = (num, places) => {
+            let multiplier = Math.pow(10, places);
+            return Math.round(num * multiplier) / multiplier;
+        }
+
+        let combinedStatline = {
+            test: statline['test'],
+            action: statline['action'],
+            items: statline['items'],
+            account: statline['account'],
+            table: statline['table'],
+            region: statline['region'],
+            setStartTime:  statline['setStartTime'],
+            setEndTime:    statline['setEndTime'],
+
+            avg: {
+                client: statline['avg'], 
+                server: roundNum(cwAvgLatency, 2),
+                network: roundNum(statline['avg'] - cwAvgLatency, 2)
+            },  
+            min: {
+                client: statline['min'], 
+                server: roundNum(cwMinLatency, 2),
+                network: roundNum(statline['min'] - cwMinLatency, 2)
+            },  
+            max: {
+                client: statline['max'], 
+                server: roundNum(cwMaxLatency, 2),
+                network: roundNum(statline['max'] - cwMaxLatency, 2)
+            }
+
+        };
+
+        fullStats.push(combinedStatline); 
+
+    }
+
+    const statsTable = ( 
+        <table className={css.statsTable}><thead>
+                <tr>
+                    <th rowSpan={2}>Test</th>
+                    <th colSpan={4}> <div className={css.latencyHeader}>Client Latency in milliseconds:</div></th>
+                </tr>
+                <tr><th>avg</th><th>min</th><th>p99</th><th>max</th></tr>
+            </thead>
+            <tbody>
+                {stats.map((statline, ix) => {
+                    let color = getBrushColor(ix);
+                    return (<tr key={ix}>
+                        <td >
+                            <span style={{color:color}}>{statline['test']}</span>
+                            <br/>{statline['items']} {statline['action']} requests</td>
+
+                        <td style={{color:color, fontWeight:'bold', fontSize:'larger'}}>{statline['avg']}</td>   
+                        <td>{statline['min']}</td>  
+                        <td>{statline['p99']}</td>  
+                        <td>{statline['max']}</td>  
+
+                        </tr>);
+                })}
+            </tbody>
+        </table>
+    );
+    const aggTypes = ['avg', 'min', 'max'];
+
+    const cwStatsTable = (
+        <table className={css.statsTableCharts}><thead>
+                <tr>
+                    <th ><div className={css.latencyHeader}>Latency<br/>Aggregation</div></th>
+                    <th > <div className={css.latencyHeader2}>Client vs Server-measured latency</div></th>
+                </tr>
+            </thead>
+            <tbody>
+                {aggTypes.map((aggType, ix) => {
+         
+                    let labels = ['service', '+ network', '= client latency'];
+                    let dataSets = [];
+
+                    fullStats.map((set, ix2) => {
+                        console.log(JSON.stringify(set[aggType], null, 2));
+                        
+
+                        let color = getBrushColor(ix2);
+
+                        dataSets.push({     
+                            "label": set['test'],
+                            "data": [
+                                set[aggType]['server'],
+                                set[aggType]['network'],
+                                set[aggType]['client']
+              
+                            ],
+                            "borderColor": color,
+                            "backgroundColor": color
+                        });
+
+                    });
+                    // console.log(JSON.stringify(dataSets, null, 2));
+
+                    let bundleCW = {
+                        labels: labels,
+                        datasets: dataSets,
+                        summary: 'Client vs Server Latency'
+                    };  
+                    
+
+                    return(<tr key={ix}><td>
+                            {aggType}
+
+                            {/* </td><td> */}
+                            {/* {JSON.stringify(fullStats)} */}
+
+                            </td><td>
+                                <div className={css.chartDiv}>
+                                <MyChart data={bundleCW} chartType='CS' />
+                                </div>
+                        </td></tr>)
+                })
+                }
+            
+
+                {stats.map((statline, ix) => {
+
+                    let color = getBrushColor(ix);
+
+                    let labels = ['min', 'avg', 'max'];
+                    let dataSets = [
+                        {
+                            "label": "service",
+                            "data": [
+                              5,
+                              4,
+                              4,
+                            ],
+                            "borderColor": "MediumBlue",
+                            "backgroundColor": "MediumBlue"
+                          },
+                          {
+                            "label": "network",
+                            "data": [
+                              5,
+                              6,
+                              7
+                            ],
+                            "borderColor": "dodgerblue",
+                            "backgroundColor": "dodgerblue"
+                          }
+                    ];
+                    let summary = '';
+
+                    let bundleCW = {
+                        labels: labels,
+                        datasets: dataSets,
+                        summary: summary
+                      };  
+
+                      return null;
+                      
+                    // return (<tr key={ix}>
+                    //     <td >
+                    //         <span style={{color:color}}>{statline['test']}</span>
+                    //         <br/>{statline['items']} {statline['action']} requests</td>
+
+                    //         <td className={css.hChartCell}>
+                                
+                    //                 <MyChart data={bundleCW} chartType='CS' />
+
+                    //                 <br/>
+
+                    //                 {JSON.stringify(fullStats[ix], null, 2)}
+
+                    //                 {/* {JSON.stringify(statline, null, 2)} */}
+                                    
+                    //                 {/* {
+                    //                     "test": "mytable small reads",
+                    //                     "action": "get",
+                    //                     "items": 200,
+                    //                     "account": "1234",
+                    //                     "table": "mytable",
+                    //                     "region": "us-east-1",
+                    //                     "setStartTime": "1746416161",
+                    //                     "setEndTime": "1746416168",
+                    //                     "avg": 36,
+                    //                     "p99": 42,
+                    //                     "max": 108,
+                    //                     "min": 27
+                    //                 } */}
+
+                                
+                    //         </td>
+
+                    //     </tr>);
+                })}
+            </tbody>
+        </table>
+    );
+
+    return (
+        <div className={css.clientVsCwDiv}>
+            {statsTable}
+            <br/><br/>
+            {cwStatsTable}
+            {/* <pre>
+                {JSON.stringify(fullStats, null, 2)}
+            </pre> */}
+        </div>);
+
+};
 
 const makeStats = (stats, options) => {
     if(!stats || stats.length === 0) {
@@ -91,35 +344,39 @@ const makeStats = (stats, options) => {
     }
     const cols = Object.keys(stats[0]);
 
-    return(<table className={css.statsTable}><thead>
-        <tr>
-            <th>Test</th>
-            <th>Action</th>
-            <th>Items</th>
-            <th>Average latency in ms</th>
-            <th>P99 latency</th>
-            <th>Max latency</th>
-     
-        </tr>
-        </thead><tbody>
+    const statsTable = (
+        
+        <table className={css.statsTable}><thead>
+            <tr>
+                <th rowSpan={2}>Test</th>
+                <th colSpan={4}> <div className={css.latencyHeader}>Latency in milliseconds:</div></th>
+            </tr>
+            <tr><th>avg</th><th>min</th><th>p99</th><th>max</th></tr>
+        </thead>
+        <tbody>
             {stats.map((statline, ix) => {
                 let color = getBrushColor(ix);
                 return (<tr key={ix}>
-                    {cols.map((col, ix2) => {
-                        return (<td key={ix2} 
-                            style={ix2 === cols.length - 3 ? {color:color, fontWeight:'bold', fontSize:'larger'} : {}}
-                        >
-                            {statline[col]}
-                            </td>);
-                    })}
+
+                    <td >
+                        <span style={{color:color}}>{statline['test']}</span>
+                        <br/>{statline['items']} {statline['action']} requests</td>
+
+                    <td style={{color:color, fontWeight:'bold', fontSize:'larger'}}>{statline['avg']}</td>   
+                    <td>{statline['min']}</td>  
+                    <td>{statline['p99']}</td>  
+                    <td>{statline['max']}</td>  
+
                     </tr>);
-
             })}
-
         </tbody>
-    </table>);
+        </table>
 
-}
+    );
+
+    return  statsTable;
+
+};
 
 const makeLinearStats = (stats, options) => {
 
@@ -155,8 +412,23 @@ const makeLinearStats = (stats, options) => {
         </tbody>
     </table>);
 
-}
+};
 
 
-export {histogram, calculateLinearRegression, calculateTailLatency, makeStats, makeLinearStats};
+function roundDateToMinute(date, direction) {
+    const milliseconds = 60 * 1000;
+    const secondsInUnit = 60;
+
+    if (direction === 'down') {
+
+        return Math.floor(new Date(date).getTime() / secondsInUnit) * secondsInUnit;
+
+    } else if (direction === 'up') {
+
+        return Math.ceil(new Date(date).getTime() / secondsInUnit) * secondsInUnit;
+
+    } else { return 'need direction'}
+  }
+
+export {histogram, calculateLinearRegression, calculateTailLatency, makeStats, makeLinearStats, clientVsCwLatencySummary};
 

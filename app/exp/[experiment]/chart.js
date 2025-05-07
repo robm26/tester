@@ -11,6 +11,11 @@ const MyChart = (req)  => {
   let summary = data['summary'];
   let chartType = req['chartType'];
 
+  // LA = Latency
+  // HI = Histogram
+  // LS = Latency Scatter
+  // CS = Latency Client vs Server
+
   let xLabel;
   let yLabel;
   let titlePre;
@@ -41,8 +46,9 @@ const MyChart = (req)  => {
     if(hideLatency) {
       showX = false;
       showXgrid = false;
-
     }
+    // console.log('*** HI');
+    // console.log(JSON.stringify(data, null, 2));
 
   }
 
@@ -56,6 +62,14 @@ const MyChart = (req)  => {
       showY = false;
       showYgrid = false;
     }
+  }
+
+  if(chartType === 'CS') {
+
+    xLabel = 'latency (ms)';
+    yLabel = '';
+    // titlePre = 'Client vs Server measured latency';
+
   }
 
   let options = {
@@ -142,10 +156,22 @@ const MyChart = (req)  => {
     );
   }
 
+  if(chartType === 'CS') {
+
+    options['indexAxis'] = 'y';
+    // options['scales']['y']['stacked'] = true;
+    options['plugins']['title'] = null; // [summary];
+
+    theChart = (
+      <Bar data={data} options={options} width={480} height={300}/>
+    );
+  }
+
   return (
     <div> 
+       {chartType !== 'CS' ? <br/> : <></>}
       {theChart}
-      <hr/>
+     
     </div>
   );
 };

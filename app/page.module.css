@@ -160,21 +160,27 @@ html, body {
   margin-right:10px;  
 }
 
-.statsTable {
+.statsTable, .statsTableCharts {
   background-color:lightgray;
   border-radius:5px;
   margin: auto;
-
   float: center;
+  /* border-collapse: collapse; */
 }
-.statsTable thead th {
 
+.statsTable, .statsTableCharts thead th {
   font-size:10pt;
 }
 
 .statsTable tbody td {
   text-align: center;
+  border-bottom: 1px solid silver;
+  border-right: 1px solid silver;
+  padding:10px;
 }
+
+
+
 .hello {
   background-color: Honeydew;
   padding:20px;
@@ -229,4 +235,65 @@ html, body {
 
 .info {
   color: blue;
+}
+
+.cwSummary {
+  margin:5px;
+  padding:5px;
+  text-align: center;
+  vertical-align: middle;
+}
+.cwSummary button {
+  font-size:small;
+  margin:5px; 
+  padding:5px;
+  background-color:lightgrey;
+  border-radius:5px;
+  border:1px solid gainsboro;
+  width:220px;
+  color:navy;
+
+}
+
+.clientVsCwDiv {
+  padding:5px;
+  margin:10px;
+  background-color: silver;
+  border-radius:5px;
+  /* overflow-x:auto;
+  font-size: small;
+  resize: both; */
+}
+
+.latencyHeader {
+  font-weight:bold;
+  text-align:center;
+
+}
+.latencyHeader2 {
+  font-weight:bold;
+  text-align:center;
+  font-size:larger;
+}
+.hChartCell {
+  background-color: lightcyan;
+  width:500px;
+}
+
+.statsTableCharts tbody td {
+  background-color: #ccc;
+  text-align: center;
+  border-bottom: 1px solid silver;
+  border-right: 1px solid silver;
+  padding:10px;
+  vertical-align: middle;
+}
+
+.statsTableCharts tbody tr:nth-child(even) td {
+  background-color: #bbb;
+}
+
+.statsTableCharts tbody tr td:nth-child(1) {
+
+  font-size:larger;
 }

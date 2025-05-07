@@ -145,8 +145,8 @@ const runGet = async (targetTable, key, strength) => {
     timeEnd = new Date();
     latency = timeEnd - timeStart;
 
-    console.log('timeStart : ' + timeStart.getTime() );
-    console.log('timeEnd   : ' +  timeEnd.getTime() );
+    // console.log('timeStart : ' + timeStart.getTime() );
+    // console.log('timeEnd   : ' +  timeEnd.getTime() );
     // console.log('latency : ' + latency);
 
     response['affectedRows'] = 1;
@@ -156,6 +156,8 @@ const runGet = async (targetTable, key, strength) => {
 };
 
 const runWarm = async (targetTable, PK, SK) => {
+
+    // console.log(' *** runWarm: targetTable : ', targetTable, ' PK : ', PK, ' SK : ', SK);
 
     const myDescribeEndpointsCommand = new DescribeEndpointsCommand({});
     const myDecResult = await client.send(myDescribeEndpointsCommand);

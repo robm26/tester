@@ -1,3 +1,7 @@
+            # aws dynamodb update-table --table-name MRSC \
+            #     --replica-updates '[{"Delete": {"RegionName": "us-east-2"}}, {"Delete": {"RegionName": "us-west-2"}}]' \
+            #     --region us-east-1 --endpoint-url https://dynamodb.us-east-1.amazonaws.com --output json --query 'TableDescription.TableArn' 
+
 REGION=$AWS_REGION
 
 if [ -z "$REGION" ]; then

@@ -1,11 +1,7 @@
 ## Tester 
 **HOME** - [Setup](./setup/README.md) - [Jobs](./jobs/README.md) - [Charts](./app/README.md)
 
-Take Amazon DynamoDB for a test drive with this benchmarking solution. Run custom jobs from your application host, review latency summary statistics, and explore performance data via interactive charts.
-
-Compare the results from two similar experiments to see the impact of design choices, such as whether to use DynamoDB 
-[Global Tables](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html) with 
-[Multi-Region Strong Consistency](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/multi-region-strong-consistency-gt.html).
+Take Amazon DynamoDB for a test drive with this benchmarking solution. As a database scientist, you can craft two similar experiments, with one being the control. The other can introduce an API feature, table configuration, or design decision that you wish to understand better. Experiment jobs are run from your application host, and measure the latency of each request. Summary statistics and interactive charts can be viewed using the custom web app, included.
 
 
 ![spash-image](/public/tester_1.png)
@@ -13,11 +9,11 @@ Compare the results from two similar experiments to see the impact of design cho
 ## Scenario
 You, as a database developer, have just taken a new role within a large engineering team. The team has been researching DynamoDB to learn more about its characteristics, and wants to know whether it would meet their application's strict performance requrements, for a possible database migration.
 
-After orientation, your new manager opens their laptop and shows you what they have discovered in the AWS Console's DynamoDB section. A Monitoring tab shows a dashboard of charts that plot the read and write latencies some recent database testing the team had done. 
+After orientation, your new manager calls you over to show what they have discovered in the AWS Console's DynamoDB section. A Monitoring tab shows a dashboard of charts, including latency charts for read and write requests. 
 
-You both agree the Cloudwatch charts work well, but it seems they aren't able to show the full latency picture as experienced by the application. This would include the network hop delay, and delay for any retries required, in addition to the DynamoDB request latency. 
+While the Cloudwatch charts work fine, they aren't able to show the full latency picture as experienced by the application. This would include the network hop delay, and delay for any retries required, in addition to DynamoDB's self-measured request latency. 
 
-As you consider the application's database performance requirements, additional questions come to mind.
+As you discuss the team's database performance requirements, additional questions come to mind.
 
 ### Questions
  * How can we see the full round-trip latency an application running on EC2 would observe when making DynamoDB requests across the network?
@@ -26,14 +22,16 @@ As you consider the application's database performance requirements, additional 
 
  * How could we see the normal distribution of all latencies to understand average and tail latency?
 
- * How could we see, in a single chart, the relative performance of various features, request types, request sizes, and regions? 
+ * How could we see, in a single chart, the relative performance of various features, request types, request sizes, table configurations, and regions? 
 
 
-Questions when considering DynamoDB Global Tables Multi-Region Strong Consistency:
+#### Questions when considering DynamoDB [Global Tables](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html) with [Multi-Region Strong Consistency](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/multi-region-strong-consistency-gt.html).
 
- * What would be the average latency for an application to perform a 25 KB strongly consistent read?
+ * What is the latency profile of a GT MRSC (two-region) write, versus a single-region table write?
+  
+ * What would be the average latency for an application to perform a strongly consistent read of an item of size N?
 
- * What would be the write latency difference between us-east-1 and us-west-2 when using GT MRSC?
+ * What would be the write latency difference when using us-east-1 versus us-west-2?
  
  * Are conditional writes any slower than regular MRSC writes?
 

@@ -18,10 +18,9 @@ It's also recommended to deploy the App onto your laptop, so that you will have 
 # Jobs Setup
 
 ### Pre-requisites
-* A bash environment such as laptop terminal, AWS Cloudshell session, or EC2 host
+* A bash environment such as AWS Cloudshell session, EC2 host, or laptop terminal
 * AWS CLI, configured with IAM access to DynamoDB, S3, and STS
 * Node.JS v18 or higher
-
 
 ### Environment setup
 1. Open the AWS console and set the region to us-east-1 (N. Virginia), or your desired region.
@@ -48,7 +47,7 @@ It's also recommended to deploy the App onto your laptop, so that you will have 
 
 The server-side component of tester is now set. Let's switch gears and deploy the client App component on your laptop. This webapp will serve the charts dashboard showing the latency of your tests.
 
-## App Setup
+# App Setup
 ### Pre-requisites
 
 * Node.JS v18 or higher

@@ -37,7 +37,7 @@ if(operation === 'put') {
 
 if(operation === 'get') {
     const rowResult = await runGet(targetTable, primaryKey, readStrength);
-    console.log('Put result:', JSON.stringify(rowResult, null, 2));
+    console.log('Get result:', JSON.stringify(rowResult, null, 2));
 }
 
 // rowResult = await runPut(targetTable, row, conditionalWrite);
