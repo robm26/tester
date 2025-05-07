@@ -147,7 +147,7 @@ const runJob = async (params) => {
                 
                 unitsOver = Math.max(0, unitsThisSecond - maxUnitVelocity);
                 const rightNow = new Date();
-                console.log(rightNow.toISOString() +  '  Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond + ', units consumed: ' + unitsThisSecond);
+                console.log('Second : ' + (jobSecond-1) + ' requests: ' + requestsThisSecond + ', units consumed: ' + unitsThisSecond);
 
                 if(rowNum > 1) {
                     jobResults.push(rowSummary);
