@@ -31,9 +31,8 @@ fi
 
 
 echo "{\n  \"bucketName\": \"$BUCKET_NAME\"\n}" > ../config.json
-echo Set bucket name in config.json
+echo Bucket name now set in config.json
 
-exit
 
 ENDPOINTURL=https://dynamodb.$REGION.amazonaws.com
 # ENDPOINTURL=http://localhost:8000

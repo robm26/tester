@@ -25,13 +25,21 @@ if [ $# -gt 0 ]
     do
         if [ $TableName == "MREC" ] 
         then
-            echo dropping replica regions for MREC
+            echo dropping us-east-2 replica for MREC
             aws dynamodb update-table --table-name $TableName \
-                --replica-updates '[{"Delete": {"RegionName": "us-east-2"}}, {"Delete": {"RegionName": "us-west-2"}}]' \
+                --replica-updates '[{"Delete": {"RegionName": "us-east-2"}}]' \
                 --region $REGION --endpoint-url $ENDPOINTURL --output $OUTPUT --query 'TableDescription.TableArn' 
 
             aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
-    
+
+            echo dropping us-west-2 replica for MREC
+            aws dynamodb update-table --table-name $TableName \
+                --replica-updates '[{"Delete": {"RegionName": "us-west-2"}}]' \
+                --region $REGION --endpoint-url $ENDPOINTURL --output $OUTPUT --query 'TableDescription.TableArn' 
+
+            aws dynamodb wait table-exists --table-name $TableName --region $REGION --endpoint-url $ENDPOINTURL
+
+
         fi
 
         if [ $TableName == "MRSC" ] 
