@@ -96,6 +96,7 @@ const clientVsCwLatencySummary = async (stats, summary) => {
     // console.log(JSON.stringify(stats,null, 2));
 
     const fullStats = [];
+    let maxLatencyForXaxis = 0;
 
     for (const statline of stats) {
 
@@ -146,21 +147,24 @@ const clientVsCwLatencySummary = async (stats, summary) => {
 
             avg: {
                 client: statline['avg'], 
-                server: roundNum(cwAvgLatency, 2),
-                network: roundNum(statline['avg'] - cwAvgLatency, 2)
+                server: roundNum(cwAvgLatency, 1),
+                network: roundNum(statline['avg'] - cwAvgLatency, 1)
             },  
             min: {
                 client: statline['min'], 
-                server: roundNum(cwMinLatency, 2),
-                network: roundNum(statline['min'] - cwMinLatency, 2)
+                server: roundNum(cwMinLatency, 1),
+                network: roundNum(statline['min'] - cwMinLatency, 1)
             },  
             max: {
                 client: statline['max'], 
-                server: roundNum(cwMaxLatency, 2),
-                network: roundNum(statline['max'] - cwMaxLatency, 2)
+                server: roundNum(cwMaxLatency, 1),
+                network: roundNum(statline['max'] - cwMaxLatency, 1)
             }
 
         };
+        if (statline['max'] > maxLatencyForXaxis) {
+            maxLatencyForXaxis = statline['max'];
+        }
 
         fullStats.push(combinedStatline); 
 
@@ -192,6 +196,8 @@ const clientVsCwLatencySummary = async (stats, summary) => {
             </tbody>
         </table>
     );
+
+
     const aggTypes = ['avg', 'min', 'max'];
 
     const cwStatsTable = (
@@ -208,9 +214,8 @@ const clientVsCwLatencySummary = async (stats, summary) => {
                     let dataSets = [];
 
                     fullStats.map((set, ix2) => {
-                        console.log(JSON.stringify(set[aggType], null, 2));
+                        // console.log(JSON.stringify(set[aggType], null, 2));
                         
-
                         let color = getBrushColor(ix2);
 
                         dataSets.push({     
@@ -243,85 +248,12 @@ const clientVsCwLatencySummary = async (stats, summary) => {
 
                             </td><td>
                                 <div className={css.chartDiv}>
-                                <MyChart data={bundleCW} chartType='CS' />
+                                <MyChart data={bundleCW} chartType='CS' maxLatencyForXaxis={maxLatencyForXaxis + 2} />
                                 </div>
                         </td></tr>)
-                })
+                    })
                 }
             
-
-                {stats.map((statline, ix) => {
-
-                    let color = getBrushColor(ix);
-
-                    let labels = ['min', 'avg', 'max'];
-                    let dataSets = [
-                        {
-                            "label": "service",
-                            "data": [
-                              5,
-                              4,
-                              4,
-                            ],
-                            "borderColor": "MediumBlue",
-                            "backgroundColor": "MediumBlue"
-                          },
-                          {
-                            "label": "network",
-                            "data": [
-                              5,
-                              6,
-                              7
-                            ],
-                            "borderColor": "dodgerblue",
-                            "backgroundColor": "dodgerblue"
-                          }
-                    ];
-                    let summary = '';
-
-                    let bundleCW = {
-                        labels: labels,
-                        datasets: dataSets,
-                        summary: summary
-                      };  
-
-                      return null;
-                      
-                    // return (<tr key={ix}>
-                    //     <td >
-                    //         <span style={{color:color}}>{statline['test']}</span>
-                    //         <br/>{statline['items']} {statline['action']} requests</td>
-
-                    //         <td className={css.hChartCell}>
-                                
-                    //                 <MyChart data={bundleCW} chartType='CS' />
-
-                    //                 <br/>
-
-                    //                 {JSON.stringify(fullStats[ix], null, 2)}
-
-                    //                 {/* {JSON.stringify(statline, null, 2)} */}
-                                    
-                    //                 {/* {
-                    //                     "test": "mytable small reads",
-                    //                     "action": "get",
-                    //                     "items": 200,
-                    //                     "account": "1234",
-                    //                     "table": "mytable",
-                    //                     "region": "us-east-1",
-                    //                     "setStartTime": "1746416161",
-                    //                     "setEndTime": "1746416168",
-                    //                     "avg": 36,
-                    //                     "p99": 42,
-                    //                     "max": 108,
-                    //                     "min": 27
-                    //                 } */}
-
-                                
-                    //         </td>
-
-                    //     </tr>);
-                })}
             </tbody>
         </table>
     );
@@ -329,11 +261,12 @@ const clientVsCwLatencySummary = async (stats, summary) => {
     return (
         <div className={css.clientVsCwDiv}>
             {statsTable}
-            <br/><br/>
+            <br/>
             {cwStatsTable}
-            {/* <pre>
-                {JSON.stringify(fullStats, null, 2)}
-            </pre> */}
+            <pre>
+                {/* {fullStats[0]['max']['client']}
+                {JSON.stringify(fullStats, null, 2)} */}
+            </pre>
         </div>);
 
 };

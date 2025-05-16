@@ -10,6 +10,7 @@ const MyChart = (req)  => {
   let data = req['data'];
   let summary = data['summary'];
   let chartType = req['chartType'];
+  let maxLatencyForXaxis;  
 
   // LA = Latency
   // HI = Histogram
@@ -24,6 +25,8 @@ const MyChart = (req)  => {
   let showY = true;
   let showXgrid = true;
   let showYgrid = true;
+
+  
 
 
   if(chartType === 'LA') {
@@ -70,7 +73,10 @@ const MyChart = (req)  => {
     yLabel = '';
     // titlePre = 'Client vs Server measured latency';
 
+    maxLatencyForXaxis = req['maxLatencyForXaxis'];
+
   }
+
 
   let options = {
     responsive: true,
@@ -117,7 +123,7 @@ const MyChart = (req)  => {
       },
       plugins: {
         legend: {
-          position: 'top',
+          position: 'right',
         },
 
         title: {
@@ -160,10 +166,19 @@ const MyChart = (req)  => {
 
     options['indexAxis'] = 'y';
     // options['scales']['y']['stacked'] = true;
-    options['plugins']['title'] = null; // [summary];
+    options['plugins']['title'] = null; 
+  
+    options['scales']['x']['max'] = maxLatencyForXaxis;
+    
+ 
+    if(data['datasets'].length === 1) {
+      options['plugins']['legend'] = null;
+      // options['scales']['y']['stacked'] = true;
+
+    }
 
     theChart = (
-      <Bar data={data} options={options} width={480} height={300}/>
+      <Bar data={data} options={options} width={600} />
     );
   }
 

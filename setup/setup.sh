@@ -30,7 +30,7 @@ else
 fi
 
 
-echo "{\n  \"bucketName\": \"$BUCKET_NAME\"\n}" > ../config.json
+echo "{  \"bucketName\": \"$BUCKET_NAME\"}" > ../config.json
 echo Bucket name now set in config.json
 
 
