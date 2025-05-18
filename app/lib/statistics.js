@@ -209,14 +209,15 @@ const clientVsCwLatencySummary = async (stats, summary) => {
             </thead>
             <tbody>
                 {aggTypes.map((aggType, ix) => {
-         
-                    let labels = ['service', '+ network', '= client latency'];
+                    
+                    let labels = ['service', 'network', 'client latency'];
                     let dataSets = [];
 
                     fullStats.map((set, ix2) => {
                         // console.log(JSON.stringify(set[aggType], null, 2));
                         
                         let color = getBrushColor(ix2);
+                        let color2 = getBrushColor(7);
 
                         dataSets.push({     
                             "label": set['test'],
@@ -229,6 +230,19 @@ const clientVsCwLatencySummary = async (stats, summary) => {
                             "borderColor": color,
                             "backgroundColor": color
                         });
+
+
+                        // dataSets.push({     
+                        //     "label": 'network',
+                        //     "data": [
+                       
+                        //         set[aggType]['network'],
+                        //         0, 0
+                    
+                        //     ],
+                        //     "borderColor": color2,
+                        //     "backgroundColor": color2
+                        // });
 
                     });
                     // console.log(JSON.stringify(dataSets, null, 2));

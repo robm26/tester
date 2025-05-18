@@ -2,7 +2,7 @@
 
 const getBrushColor = (index, val) => {
 
-    const colorList = ['MediumBlue','dodgerblue',  'maroon', 'crimson', 'lime', 'cyan'];
+    const colorList = ['MediumBlue','dodgerblue',  'maroon', 'crimson', 'lime', 'cyan', 'coral', 'plum'];
     
     return colorList[index];
 

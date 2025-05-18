@@ -25,9 +25,9 @@ const MyChart = (req)  => {
   let showY = true;
   let showXgrid = true;
   let showYgrid = true;
+  let stacked = false;
 
   
-
 
   if(chartType === 'LA') {
     xLabel = summary['xAxisLabel'] + ' (' + summary['xAxisUnits'] + ')';
@@ -75,6 +75,8 @@ const MyChart = (req)  => {
 
     maxLatencyForXaxis = req['maxLatencyForXaxis'];
 
+    stacked = true;
+
   }
 
 
@@ -118,7 +120,8 @@ const MyChart = (req)  => {
               size: 12,
               weight: 'bold',
             }
-          }
+          },
+          stacked: false
         }
       },
       plugins: {
@@ -173,7 +176,7 @@ const MyChart = (req)  => {
  
     if(data['datasets'].length === 1) {
       options['plugins']['legend'] = null;
-      // options['scales']['y']['stacked'] = true;
+      options['scales']['x']['stacked'] = true;
 
     }
 
