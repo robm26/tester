@@ -210,42 +210,46 @@ const clientVsCwLatencySummary = async (stats, summary) => {
             <tbody>
                 {aggTypes.map((aggType, ix) => {
                     
-                    let labels = ['service', 'network', 'client latency'];
+                    // let labels = ['service', 'network', 'client latency'];
+                    let labels = [];
                     let dataSets = [];
+                    let dataService = [];
+                    let dataNetwork = [];
+                    let dataClient = [];
 
                     fullStats.map((set, ix2) => {
-                        // console.log(JSON.stringify(set[aggType], null, 2));
-                        
-                        let color = getBrushColor(ix2);
-                        let color2 = getBrushColor(7);
+                        labels.push(set['test']);
 
-                        dataSets.push({     
-                            "label": set['test'],
-                            "data": [
-                                set[aggType]['server'],
-                                set[aggType]['network'],
-                                set[aggType]['client']
-              
-                            ],
-                            "borderColor": color,
-                            "backgroundColor": color
-                        });
-
-
-                        // dataSets.push({     
-                        //     "label": 'network',
-                        //     "data": [
-                       
-                        //         set[aggType]['network'],
-                        //         0, 0
-                    
-                        //     ],
-                        //     "borderColor": color2,
-                        //     "backgroundColor": color2
-                        // });
+                        dataService.push(set[aggType]['server']);
+                        dataNetwork.push(set[aggType]['network']);
+                        dataClient.push(set[aggType]['client']);
 
                     });
-                    // console.log(JSON.stringify(dataSets, null, 2));
+
+                    let color = getBrushColor(7);
+                    let color2 = getBrushColor(8);
+
+                    dataSets.push({     
+                        "label": 'service',
+                        "datalabels": {
+                            "labels": {
+                                "title": {
+                                    "color": 'yellow'
+                                }
+                            }
+                        },
+                        "data": dataService,
+                        "borderColor": color,
+                        "backgroundColor": color
+                    });
+
+                    dataSets.push({     
+                        "label": 'network',
+                        "data": dataNetwork,
+                        "borderColor": color2,
+                        "backgroundColor": color2
+                    });
+
 
                     let bundleCW = {
                         labels: labels,

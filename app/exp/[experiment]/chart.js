@@ -167,19 +167,36 @@ const MyChart = (req)  => {
 
   if(chartType === 'CS') {
 
+
+    const barLabelFormatter = (value, context) => {
+
+      return context.chart.data.labels[context.dataIndex];
+
+    }
+
     options['indexAxis'] = 'y';
-    // options['scales']['y']['stacked'] = true;
+
     options['plugins']['title'] = null; 
   
     options['scales']['x']['max'] = maxLatencyForXaxis;
     
- 
+    options['scales']['x']['stacked'] = true;
+
     if(data['datasets'].length === 1) {
       options['plugins']['legend'] = null;
       options['scales']['x']['stacked'] = true;
 
     }
 
+    // options['plugins']['datalabels'] = null;
+
+    console.log('*** data');
+    console.log(JSON.stringify(data, null, 2));
+
+    console.log('### options');
+    console.log(JSON.stringify(options, null, 2));
+
+    
     theChart = (
       <Bar data={data} options={options} width={600} />
     );
