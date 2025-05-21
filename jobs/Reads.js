@@ -55,9 +55,13 @@ const run = async () => {
         SK: 'SK', 
         jobFile: 'load-smallitems.js',
 
-        maxUnitVelocity: 100
+        maxUnitVelocity: 100,
+        showEachRequest: false,
+        waitForMinute: true
         
     };
+
+    // console.log(JSON.stringify(params, null, 2));
 
     results = await runJob(params);
     

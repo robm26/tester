@@ -28,7 +28,9 @@ const runJob = async (params) => {
     const conditionalWrite = params['conditionalWrite'] || 'false';
     const maxUnitVelocity = params['maxUnitVelocity'] || 1000;
     const maxUnitVelocityAdjusted = 0;
-    
+
+    const showEachRequest = params['showEachRequest'];
+    const waitForMinute = params['waitForMinute'];
 
     console.log('Job parameters :\n' + JSON.stringify(params, null, 2));
 
@@ -70,14 +72,17 @@ const runJob = async (params) => {
 
     const msUntilNextSec = 1000 - (startMs - (startSec * 1000));
     const secondsUntilNextMin = 60 - startSeconds;
+
+    console.log('waitForMinute: ' + waitForMinute);
+
+    if(waitForMinute) {
+        startSec += secondsUntilNextMin; 
+        console.log('Pausing for ' + secondsUntilNextMin + ' seconds, to start at the top of a minute');
+        await sleep(secondsUntilNextMin * 1000);  // delay to start at the top of a minute
+    } 
     
-    console.log('Pausing for ' + secondsUntilNextMin + ' seconds, to start at the top of a minute');
-
     await sleep(msUntilNextSec);              // delay to start at the top of a second
-    await sleep(secondsUntilNextMin * 1000);  // delay to start at the top of a minute
-
-    startSec += secondsUntilNextMin; 
-
+    
     // const nowNow = Date.now();
     // console.log('starting at nowNow: ');
     // console.log(new Date(nowNow));
@@ -178,6 +183,10 @@ const runJob = async (params) => {
                     key[SK] = row[SK];
 
                     rowResult = await runGet(targetTable, key, strength);
+
+                    if(showEachRequest) {
+                        console.log('row ' + rowNum + ', latency ' + rowResult['latency'] + ' ms');
+                    }
                 }
                 
             } catch (err) { 
@@ -194,7 +203,6 @@ const runJob = async (params) => {
             requestId = rowMetadata.requestId || rowMetadataErr?.requestId;
 
             capacityUnits = rowResult?.result?.ConsumedCapacity?.CapacityUnits;
-
 
             unitsThisSecond += capacityUnits;
 
