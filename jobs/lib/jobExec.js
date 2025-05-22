@@ -29,8 +29,11 @@ const runJob = async (params) => {
     const maxUnitVelocity = params['maxUnitVelocity'] || 1000;
     const maxUnitVelocityAdjusted = 0;
 
-    const showEachRequest = params['showEachRequest'];
-    const waitForMinute = params['waitForMinute'];
+    let showEachRequest = params['showEachRequest'];
+    let waitForMinute = params['waitForMinute'];
+
+    if(!showEachRequest) { showEachRequest = false; }
+    if(!waitForMinute) { waitForMinute = true; }
 
     console.log('Job parameters :\n' + JSON.stringify(params, null, 2));
 
@@ -73,9 +76,9 @@ const runJob = async (params) => {
     const msUntilNextSec = 1000 - (startMs - (startSec * 1000));
     const secondsUntilNextMin = 60 - startSeconds;
 
-    console.log('waitForMinute: ' + waitForMinute);
+    // console.log('waitForMinute: ' + waitForMinute);
 
-    if(waitForMinute) {
+    if(waitForMinute === true) {
         startSec += secondsUntilNextMin; 
         console.log('Pausing for ' + secondsUntilNextMin + ' seconds, to start at the top of a minute');
         await sleep(secondsUntilNextMin * 1000);  // delay to start at the top of a minute
@@ -185,7 +188,8 @@ const runJob = async (params) => {
                     rowResult = await runGet(targetTable, key, strength);
 
                     if(showEachRequest) {
-                        console.log('row ' + rowNum + ', latency ' + rowResult['latency'] + ' ms');
+                        if(newSecond === true) { console.log(); }
+                        console.log('  row ' + rowNum + ', latency ' + rowResult['latency'] + ' ms');
                     }
                 }
                 

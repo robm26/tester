@@ -10,6 +10,10 @@ const expName = args[1].substring(args[1].lastIndexOf('/')+1);
 const expArgs = args.slice(2);
 const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
 
+const showEachRequest = expArgs.length > 1 ? expArgs[1] : false;
+const waitForMinute = expArgs.length > 2 ? expArgs[2] : true;
+
+
 const tableName = 'mytable';
 const operation = 'read';
 
@@ -56,8 +60,8 @@ const run = async () => {
         jobFile: 'load-smallitems.js',
 
         maxUnitVelocity: 100,
-        showEachRequest: false,
-        waitForMinute: true
+        showEachRequest: showEachRequest,
+        waitForMinute: waitForMinute
         
     };
 
