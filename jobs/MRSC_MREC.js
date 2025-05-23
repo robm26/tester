@@ -10,6 +10,11 @@ const expName = args[1].substring(args[1].lastIndexOf('/')+1);
 const expArgs = args.slice(2);
 const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
 
+const showEachRequest = expArgs.length > 1 ? expArgs[1] : false;
+const waitForMinute = expArgs.length > 2 ? expArgs[2] : true;
+
+
+
 const operation = expArgs[1] || 'write';
 
 const tableNames = ['MREC', 'MRSC'];
@@ -55,7 +60,9 @@ const run = async () => {
         targetTable: tableNames[0], items: summary.itemCount, 
         PK: 'PK', 
         SK: 'SK', 
-        jobFile: 'load-smallitems.js'
+        jobFile: 'load-smallitems.js',
+        showEachRequest: showEachRequest,
+        waitForMinute: waitForMinute
     };
 
     results = await runJob(params);
@@ -70,6 +77,8 @@ const run = async () => {
         operation: 'put',   
         targetTable: tableNames[1], items: summary.itemCount, 
         PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
+        showEachRequest: showEachRequest,
+        waitForMinute: waitForMinute
     };
 
     results = await runJob(params);
@@ -85,6 +94,8 @@ const run = async () => {
         strength: 'default', 
         targetTable: tableNames[1], items: summary.itemCount, 
         PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
+        showEachRequest: showEachRequest,
+        waitForMinute: waitForMinute
     };
 
     results = await runJob(params);
@@ -100,12 +111,13 @@ const run = async () => {
         strength: 'strong', 
         targetTable: tableNames[1], items: summary.itemCount, 
         PK: 'PK', SK: 'SK', jobFile: 'load-smallitems.js',
+        showEachRequest: showEachRequest,
+        waitForMinute: waitForMinute
     };
 
     results = await runJob(params);
     console.log('got : ' + params['items']);
     console.log();
-
 
 
         // // *************************** Test MREC conditional writes ***************************

@@ -1,24 +1,27 @@
 import * as fs from 'node:fs/promises';
 import {bucketUploader} from "./lib/s3.js";
 import {runJob} from "./lib/jobExec.js";
+import { fileURLToPath } from 'url';
+import { URL } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const expName = __filename.substring(__filename.lastIndexOf('/')+1);
 
-import config from '../config.json' with { type: 'json' };
+// import config from '../config.json' with { type: 'json' };
 
 const args = process.argv;
-const expName = args[1].substring(args[1].lastIndexOf('/')+1);
+let arg1 = args[1].substring(args[1].lastIndexOf('/')+1);
+if(arg1.slice(-3) !== '.js') {
+    arg1 += '.js';
+}
 
 const expArgs = args.slice(2);
-const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
-
-const showEachRequest = expArgs.length > 1 ? expArgs[1] : false;
-const waitForMinute = expArgs.length > 2 ? expArgs[2] : true;
-
 
 const tableName = 'mytable';
 const operation = 'read';
 
+console.log('Experiment Name : ' + expName);
+
 let summary = {
-    itemCount: itemCount,
 
     desc: 'Small item read test, target table mytable',
     type: 'Line',
@@ -43,7 +46,15 @@ console.log();
 console.log('Experiment Description : ' + summary['desc']);
 console.log();
 
-const run = async () => {
+const run = async (req) => {
+
+    const itemCount = req['itemCount'] ? req['itemCount'] : 200;
+    const showEachRequest = req['showEachRequest'] ? req['showEachRequest'] : false;
+    const waitForMinute = req['waitForMinute'] ? req['waitForMinute'] : true;
+    const bucketName = req['bucketName'];
+
+    summary['itemCount'] = itemCount;
+
     const expName = 'E' + Math.floor(new Date().getTime() / 1000).toString();
 
     let params;
@@ -74,21 +85,28 @@ const run = async () => {
     // *************************** Upload to S3 ***************************
     // put folder and file in S3
 
-    const fileData = await fs.readFile( '../public/experiments/' +  params.experiment + '/data.csv', 'utf-8');
+    // const fileData = await fs.readFile( './public/experiments/' +  params.experiment + '/data.csv', 'utf-8');
+    const fileData = await fs.readFile( '/tmp/' +  params.experiment + '/data.csv', 'utf-8');
+
 
     const key = 'exp/' + expName + '/data.csv';
     const keySummary = 'exp/' + expName + '/summary.json';
 
-    const res = await bucketUploader(config['bucketName'], key, fileData);
+    const res = await bucketUploader(bucketName, key, fileData);
 
-    const res2 = await bucketUploader(config['bucketName'], keySummary, JSON.stringify(summary, null, 2));
+    const res2 = await bucketUploader(bucketName, keySummary, JSON.stringify(summary, null, 2));
 
     console.log();
+
+    return results;
 
 
 };
 
+export {run};
 
-void run().then(()=>{
-    process.exit(1);
-});
+// if(expName === arg1) {
+//     void run().then(()=>{
+//         process.exit(1);
+//     });
+// }

@@ -8,10 +8,12 @@ const currentFolder = currentPath.slice(-1)[0];
 
 let pathToJobsFolder = '../';
 
-let pathToExperimentsFolder = '../' + experimentResultsRoot + '/';
-if(currentFolder === 'jobs') {
-    pathToExperimentsFolder = '../' + experimentResultsRoot + '/';
-}
+// let pathToExperimentsFolder = './' + experimentResultsRoot + '/';
+// if(currentFolder === 'jobs') {
+//     pathToExperimentsFolder = './' + experimentResultsRoot + '/';
+// }
+
+let pathToExperimentsFolder = '/tmp/';
 
 
 const runJob = async (params) => {
@@ -184,6 +186,7 @@ const runJob = async (params) => {
 
                     key[PK] = row[PK];
                     key[SK] = row[SK];
+                    // console.log(key);
 
                     rowResult = await runGet(targetTable, key, strength);
 
