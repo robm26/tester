@@ -2,26 +2,21 @@ import * as fs from 'node:fs/promises';
 import {bucketUploader} from "./lib/s3.js";
 import {runJob} from "./lib/jobExec.js";
 
-import config from '../config.json' with { type: 'json' };
 
 const args = process.argv;
 const expName = args[1].substring(args[1].lastIndexOf('/')+1);
 
-const expArgs = args.slice(2);
-const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
+// const expArgs = args.slice(2);
+// const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
 
-const showEachRequest = expArgs.length > 1 ? expArgs[1] : false;
-const waitForMinute = expArgs.length > 2 ? expArgs[2] : true;
+// const showEachRequest = expArgs.length > 1 ? expArgs[1] : false;
+// const waitForMinute = expArgs.length > 2 ? expArgs[2] : true;
 
-
-
-const operation = expArgs[1] || 'write';
+// const operation = expArgs[1] || 'write';
 
 const tableNames = ['MREC', 'MRSC'];
 
 let summary = {
-
-    itemCount: itemCount,
 
     desc: 'Comparing small item request latency for MREC and MRSC modes of DynamoDB Global Tables',
     type: 'Line',
@@ -34,9 +29,7 @@ let summary = {
     yAxisUnits: 'ms',
     yAttribute: 'latency',
 
-    operation: operation,
     expName: expName,
-    expArgs: expArgs,
 
     charts: ['LA','HI'] // latency simple and histogram
 
@@ -46,15 +39,30 @@ console.log();
 console.log('Experiment Description : ' + summary['desc']);
 console.log();
 
-const run = async () => {
-    const expName = 'E' + Math.floor(new Date().getTime() / 1000).toString();
+const run = async (req) => {
+
+    req['desc'] = summary['desc'];
+
+    console.log('expName    : ' + req['expName']);
+    console.log('itemCount  : ' + req['itemCount']);
+    console.log('desc       : ' + req['desc']);
+    console.log('bucketName : ' + req['bucketName']);
+    console.log('---------------------------------');
+
+    const itemCount = req['itemCount'] ? req['itemCount'] : 200;
+    const showEachRequest = req['showEachRequest'] ? req['showEachRequest'] : false;
+    const waitForMinute = req['waitForMinute'] ? req['waitForMinute'] : true;
+    const bucketName = req['bucketName'];
+    summary['itemCount'] = itemCount;
+
+    const expNum = 'E' + Math.floor(new Date().getTime() / 1000).toString();
 
     let params;
     let results;
 
     //  // *************************** Test MREC writes ***************************
     params = {
-        experiment: expName, 
+        experiment: expNum, 
         test: 'MREC writes',
         operation: 'put', 
         targetTable: tableNames[0], items: summary.itemCount, 
@@ -66,13 +74,13 @@ const run = async () => {
     };
 
     results = await runJob(params);
-    console.log('put : ' + params['items']);
-    console.log();
+    console.log('put : ' + summary.itemCount);
+    console.log('-');
 
     // // *************************** Test MRSC writes ***************************
 
     params = {
-        experiment: expName, 
+        experiment: expNum, 
         test: 'MRSC writes',  
         operation: 'put',   
         targetTable: tableNames[1], items: summary.itemCount, 
@@ -82,13 +90,13 @@ const run = async () => {
     };
 
     results = await runJob(params);
-    console.log('put : ' + params['items']);
-    console.log();
+    console.log('put : ' + summary.itemCount);
+    console.log('-');
 
     // *************************** Test MRSC default reads *****************
 
     params = {
-        experiment: expName, 
+        experiment: expNum, 
         test: 'MRSC default reads', 
         operation: 'get',
         strength: 'default', 
@@ -99,13 +107,13 @@ const run = async () => {
     };
 
     results = await runJob(params);
-    console.log('got : ' + params['items']);
-    console.log();
+    console.log('got : ' + summary.itemCount);
+    console.log('-');
 
     // *************************** Test MRSC strong reads *****************
 
     params = {
-        experiment: expName, 
+        experiment: expNum, 
         test: 'MRSC strong reads', 
         operation: 'get',
         strength: 'strong', 
@@ -116,8 +124,8 @@ const run = async () => {
     };
 
     results = await runJob(params);
-    console.log('got : ' + params['items']);
-    console.log();
+    console.log('got : ' + summary.itemCount);
+    console.log('-');
 
 
         // // *************************** Test MREC conditional writes ***************************
@@ -151,22 +159,23 @@ const run = async () => {
         // console.log();
 
 
-    // *************************** Upload to S3 ***************************
-    // put folder and file in S3
+   // *************************** Upload to S3 ***************************
 
-    const fileData = await fs.readFile( '../public/experiments/' +  params.experiment + '/data.csv', 'utf-8');
+    const fileData = await fs.readFile( '/tmp/' +  params.experiment + '/data.csv', 'utf-8');
 
-    const key = 'exp/' + expName + '/data.csv';
-    const keySummary = 'exp/' + expName + '/summary.json';
+    const key = 'exp/' + expNum + '/data.csv';
+    const keySummary = 'exp/' + expNum + '/summary.json';
 
-    const res = await bucketUploader(config['bucketName'], key, fileData);
-    const res2 = await bucketUploader(config['bucketName'], keySummary, JSON.stringify(summary, null, 2));
+    const res = await bucketUploader(bucketName, key, fileData);
 
-    console.log();
+    const res2 = await bucketUploader(bucketName, keySummary, JSON.stringify(summary, null, 2));
+
+    return results;
 
 };
 
+export {run};
 
-void run().then(()=>{
-    process.exit(1);
-});
+// void run().then(()=>{
+//     process.exit(1);
+// });

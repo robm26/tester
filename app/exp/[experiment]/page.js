@@ -12,8 +12,8 @@ import MyChart from '@/app/exp/[experiment]/chart.js';
 import {csv} from 'csvtojson';
 
 const histogramConfig = {
-  "buckets": 100,
-  "range": 200
+  "buckets": 40,
+  "range": 80
 };
 
 export default async function Page({params}) {

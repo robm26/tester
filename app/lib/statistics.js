@@ -11,7 +11,9 @@ function histogram(arr, buckets, range) {
     if(!arr || !buckets) {
         return null;
     }
-    
+    // console.log('histogram');
+    // console.log(buckets, range);
+
     let bucketSize = range / buckets;
     let bucketList = Array.from(Array(buckets), (e,i)=>  { 
         return i * (range / buckets);

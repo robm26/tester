@@ -17,6 +17,7 @@ let pathToExperimentsFolder = '/tmp/';
 
 
 const runJob = async (params) => {
+    // console.log('params: ', JSON.stringify(params,null,2));
 
     const expName = params['expName'] || null;
     const experiment = params['experiment'];
@@ -37,7 +38,9 @@ const runJob = async (params) => {
     if(!showEachRequest) { showEachRequest = false; }
     if(!waitForMinute) { waitForMinute = true; }
 
-    console.log('Job parameters :\n' + JSON.stringify(params, null, 2));
+    // console.log('showEachRequest: ' + showEachRequest);
+    // console.log('waitForMinute: ' + waitForMinute);
+    // console.log('Job parameters :\n' + JSON.stringify(params, null, 2));
 
     const jobFile = params['jobFile'];
 
@@ -78,9 +81,9 @@ const runJob = async (params) => {
     const msUntilNextSec = 1000 - (startMs - (startSec * 1000));
     const secondsUntilNextMin = 60 - startSeconds;
 
-    // console.log('waitForMinute: ' + waitForMinute);
+    //console.log('waitForMinute: ' + waitForMinute);
 
-    if(waitForMinute === true) {
+    if(waitForMinute === 'true' || waitForMinute === true) {
         startSec += secondsUntilNextMin; 
         console.log('Pausing for ' + secondsUntilNextMin + ' seconds, to start at the top of a minute');
         await sleep(secondsUntilNextMin * 1000);  // delay to start at the top of a minute
@@ -180,6 +183,11 @@ const runJob = async (params) => {
                 if(operation === 'put') {
                     rowResult = await runPut(targetTable, row, conditionalWrite);
 
+                    if(showEachRequest === 'true' || showEachRequest === true) {
+                        if(newSecond === true) { console.log('-'); }
+                        console.log('  row ' + rowNum + ', latency ' + rowResult['latency'] + ' ms');
+                    }
+
                 }
                 if(operation === 'get') {
                     const key = {};
@@ -190,8 +198,10 @@ const runJob = async (params) => {
 
                     rowResult = await runGet(targetTable, key, strength);
 
-                    if(showEachRequest) {
-                        if(newSecond === true) { console.log(); }
+                    if(showEachRequest === 'true' || showEachRequest === true) {
+
+                        if(newSecond === true) { console.log('-'); }
+
                         console.log('  row ' + rowNum + ', latency ' + rowResult['latency'] + ' ms');
                     }
                 }

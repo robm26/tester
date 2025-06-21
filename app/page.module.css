@@ -160,7 +160,7 @@ html, body {
   margin-right:10px;  
 }
 
-.statsTable, .statsTableCharts {
+.statsTable {
   background-color:lightgray;
   border-radius:5px;
   margin: auto;
@@ -168,9 +168,24 @@ html, body {
   /* border-collapse: collapse; */
 }
 
+.statsTableCharts {
+  background-color:silver;
+  border-radius:5px;
+  border: 2px solid gainsboro;
+  margin: auto;
+  float: center;
+  /* border-collapse: collapse; */
+}
+
+.statsTableCharts thead th {
+  background-color: silver;
+
+}
+
 .statsTable, .statsTableCharts thead th {
   font-size:10pt;
 }
+
 
 .statsTable tbody td {
   text-align: center;
@@ -290,10 +305,40 @@ html, body {
 }
 
 .statsTableCharts tbody tr:nth-child(even) td {
-  background-color: #bbb;
+  background-color: #ccc;
 }
 
 .statsTableCharts tbody tr td:nth-child(1) {
 
   font-size:larger;
+}
+
+.prevNext {
+  font-size:larger;
+  margin: auto;
+  width: 90%;
+
+}
+
+.hideChartWidget span{
+  float:right;
+}
+
+.hideChartWidget button {
+  color:grey;
+  border:none;
+  padding:5px;
+  border-radius:3px;
+  background-color: gainsboro;
+  font-size:larger;
+}
+
+.hiddenChart {
+  display: none;
+}
+
+.displayedChart {
+  background-color:#ccc;
+  border-radius:3px;
+  display:block;
 }

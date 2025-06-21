@@ -7,3 +7,10 @@ public/build/
 .env
 app2/
 .next/
+
+config.json
+jobs/lambda_function.zip
+jobs/scratch.js
+setup/resetS3.sh
+setup/test.sh
+

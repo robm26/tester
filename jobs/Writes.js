@@ -6,25 +6,12 @@ import { URL } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const expName = __filename.substring(__filename.lastIndexOf('/')+1);
 
-import config from '../config.json' with { type: 'json' };
-
-const args = process.argv;
-let arg1 = args[1].substring(args[1].lastIndexOf('/')+1);
-if(arg1.slice(-3) !== '.js') {
-    arg1 += '.js';
-}
-
-const expArgs = args.slice(2);
-
-// const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
-// const tableName = expArgs.length > 1 ? expArgs[1] : 'mytable';
-
 const tableName = 'mytable';
 const operation = 'write';
 
 let summary = {
 
-    desc: 'Small item write test, target table mytable',
+    desc: 'Small item random writes',
     type: 'Line',
 
     xAxisLabel: 'request',
@@ -37,7 +24,6 @@ let summary = {
 
     operation: operation,
     expName: expName,
-    expArgs: expArgs,
 
     charts: ['LA','HI'] // latency simple and histogram
 
@@ -47,14 +33,25 @@ console.log('Experiment Description : ' + summary['desc']);
 console.log();
 
 const run = async (req) => {
+    // console.log('---------------------------------');
+    // console.log('REQ : ' + JSON.stringify(req,null,2));
+
+    req['desc'] = summary['desc'];
+
+    console.log('expName    : ' + req['expName']);
+    console.log('itemCount  : ' + req['itemCount']);
+    console.log('desc       : ' + req['desc']);
+    console.log('bucketName : ' + req['bucketName']);
+    console.log('---------------------------------');
 
     const itemCount = req['itemCount'] ? req['itemCount'] : 200;
     const showEachRequest = req['showEachRequest'] ? req['showEachRequest'] : false;
     const waitForMinute = req['waitForMinute'] ? req['waitForMinute'] : true;
+    const bucketName = req['bucketName'];
 
     summary['itemCount'] = itemCount;
 
-    const expName = 'E' + Math.floor(new Date().getTime() / 1000).toString();
+    const expNum = 'E' + Math.floor(new Date().getTime() / 1000).toString();
 
     let params;
     let results;
@@ -62,7 +59,7 @@ const run = async (req) => {
     // *************************** Test small writes ***************************
     
     params = {
-        experiment: expName, 
+        experiment: expNum, 
         test: 'mytable small writes',
         operation: 'put', 
         targetTable: tableName, 
@@ -71,23 +68,41 @@ const run = async (req) => {
         SK: 'SK', 
         jobFile: 'load-smallitems.js',
 
-        maxUnitVelocity: 100
+        maxUnitVelocity: 100,
+        showEachRequest: showEachRequest,
+        waitForMinute: waitForMinute
 
     };
 
-    results = await runJob(params);
+        results = await runJob(params);
+        console.log('put : ' + params['items'] + '\n');
+
+        // *************************** Upload to S3 ***************************
     
-    console.log('\nput : ' + params['items'] + '\n');
+        const fileData = await fs.readFile( '/tmp/' +  params.experiment + '/data.csv', 'utf-8');
+    
+        const key = 'exp/' + expNum + '/data.csv';
+        const keySummary = 'exp/' + expNum + '/summary.json';
+    
+        const res = await bucketUploader(bucketName, key, fileData);
+    
+        const res2 = await bucketUploader(bucketName, keySummary, JSON.stringify(summary, null, 2));
+    
+        return results;
 
-    const fileData = await fs.readFile( '../public/experiments/' +  params.experiment + '/data.csv', 'utf-8');
 
-    const key = 'exp/' + expName + '/data.csv';
-    const keySummary = 'exp/' + expName + '/summary.json';
+    
+    // console.log('\nput : ' + params['items'] + '\n');
 
-    const res = await bucketUploader(config['bucketName'], key, fileData);
-    const res2 = await bucketUploader(config['bucketName'], keySummary, JSON.stringify(summary, null, 2));
+    // const fileData = await fs.readFile( '../public/experiments/' +  params.experiment + '/data.csv', 'utf-8');
 
-    console.log();
+    // const key = 'exp/' + expName + '/data.csv';
+    // const keySummary = 'exp/' + expName + '/summary.json';
+
+    // const res = await bucketUploader(config['bucketName'], key, fileData);
+    // const res2 = await bucketUploader(config['bucketName'], keySummary, JSON.stringify(summary, null, 2));
+
+    // console.log();
 
 };
 

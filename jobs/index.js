@@ -12,7 +12,7 @@ const handler = async (event, context) => {
 
     const response = await exp.run(event);
 
-    return JSON.stringify(response);
+    return response;
 
 };
 

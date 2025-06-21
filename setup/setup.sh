@@ -7,6 +7,8 @@ if [ -z "$REGION" ]; then
     exit
 fi
 
+mkdir ../public/experiments
+
 AWS_ACCT=$(aws sts get-caller-identity --output text --query 'Account')
 ACCT_HASH=$(printf "%s" $AWS_ACCT |  md5sum)
 
@@ -22,8 +24,11 @@ if aws s3api head-bucket --bucket "$BUCKET_NAME" >/dev/null 2>&1; then
 
 else
 
+    REGION=us-east-1
+    BUCKET_NAME=tester-b4797f01b4
+
     echo Creating S3 bucket 
-    aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION >/dev/null 
+    aws s3api create-bucket --bucket $BUCKET_NAME --region $REGION  >/dev/null 
     aws s3api wait bucket-exists --bucket $BUCKET_NAME
     echo $BUCKET_ARN
 

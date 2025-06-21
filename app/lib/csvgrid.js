@@ -3,14 +3,14 @@ import css from '@/app/page.module.css';
 
 import { useState } from 'react';
 
-import { getBrushColor } from "@/app/lib/brushcolor.js";
-
 
 const CsvGrid = (data) => {
     const [visibility, setVisibility] = useState(false);
 
     const dataRows = data['data'].split('\n');  
     const experiment = dataRows[1].split(',')[1];
+
+    let dataForDownloadRef = 'data:text/plain;charset=utf-8,' + encodeURIComponent(data['data']); 
 
     let gridTableSummary = (
         <span className={css.gridTableSummary}>
@@ -24,14 +24,16 @@ const CsvGrid = (data) => {
             </span>
             &nbsp; 
 
-            download: &nbsp;&nbsp;
-            <a href={'/experiments/' + experiment + '/data.csv'} download={experiment + '-data.csv'}>CSV</a>
+            &nbsp;&nbsp;
+            <a href={dataForDownloadRef} download={experiment + '-data.csv'}>download CSV</a>
              &nbsp;
              &nbsp; 
 
-            <a href={'ms-excel:ofe|u|http://localhost:3000/experiments/' + experiment + '/data.csv'}
+            {/* <a href={'ms-excel:ofe|u|http://localhost:3000/experiments/' + experiment + '/data.csv'}
             download={experiment + '-data.csv'}>Excel</a>
-            &nbsp;
+            &nbsp; */}
+
+         
         </span>
     );
 

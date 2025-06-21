@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# First, create a nodejs function with the name "tester-function" in AWS Lambda.
+# It should have DynamoDB, S3, and STS access
+# Then, this script can be used to deploy the function code.
+
 # Variables
 FUNCTION_NAME="tester-function"
 ZIP_FILE="lambda_function.zip"
@@ -15,7 +19,7 @@ fi
 # Step 2: Zip the Node.js function and dependencies
 echo "Zipping the Lambda function..."
 
-zip -r "$ZIP_FILE" . -x "*.git*" "node_modules/*" ".cache/*" "*.sh" "*.md" "public/experiments/E*"
+zip -r "$ZIP_FILE" . -x "*.git*" "node_modules/*" ".cache/*" "*.sh" "*.md" "public/experiments/E*" ".DS_Store" "public/*"
 
 
 # Step 3: Deploy the Lambda function
@@ -30,6 +34,4 @@ else
   echo "Deployment failed!"
 fi
 
-# Step 5: Clean up
-rm package.json
-# rm "$ZIP_FILE"
+

@@ -1,12 +1,16 @@
 'use client'
 const hideLatency = false;
 
+import css from '@/app/page.module.css';
+import { useState } from 'react';
 import { Line, Bar, Scatter } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js/auto';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 const MyChart = (req)  => {
+  const [vis, setVis] = useState(true);
+
   let data = req['data'];
   let summary = data['summary'];
   let chartType = req['chartType'];
@@ -188,28 +192,37 @@ const MyChart = (req)  => {
 
     }
 
-    // options['plugins']['datalabels'] = null;
-
-    // console.log('*** data');
-    // console.log(JSON.stringify(data, null, 2));
-
-    // console.log('### options');
-    // console.log(JSON.stringify(options, null, 2));
-
     
     theChart = (
       <Bar data={data} options={options} width={600} />
     );
   }
 
+  function handleClick() {
+    console.log('Chart clicked');
+    setVis(!vis);
+  }
+
   return (
-    <div> 
-       {chartType !== 'CS' ? <br/> : <></>}
-      {theChart}
-     
+    <div className={css.hideChartWidget}> 
+
+      <span >
+        <button onClick={handleClick}>
+          {vis ? '-':'+'}
+        </button>
+
+      </span>
+
+      <div className={vis ? css.displayedChart : css.hiddenChart }>
+        {chartType !== 'CS' ? <br/> : <></>}
+        {theChart}
+      </div>
+      <br/>
+
     </div>
   );
 };
+
 
 
 export default MyChart;

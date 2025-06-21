@@ -30,10 +30,17 @@ It's also recommended to deploy the App onto your laptop, so that you will have 
  ```
  git clone https://github.com/robm26/tester.git
  ```
+4. Install Node.JS dependencies
+   
+   ```
+   cd tester
+   npm install
+   ```
 
-1. Locate and run the setup script which will create an S3 bucket and four DynamoDB tables.
+5. Locate and run the setup script which will create an S3 bucket and four DynamoDB tables.
 ```
-   cd tester/setup
+   export AWS_REGION=us-east-1
+   cd setup
    chmod +x ./setup.sh
    ./setup.sh
 ```
