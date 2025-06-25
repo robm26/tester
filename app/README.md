@@ -3,7 +3,7 @@
 [HOME](../README.md) - [Setup](../setup/README.md) -  [Jobs](../jobs/README.md) -  **App**
 
 ## Charts
-The app/exp folder contains chart rendering functions, and use Next.js, chart.js and react-chartjs-2 packages.
+The tester/app folder contains chart rendering functions, using Next.js, chart.js and react-chartjs-2 packages.
 
 ## Statistics
 Functions are provided to calculate average & p99 (tail) latencies, draw a linear regression best fit line, and draw a latency histogram. 
