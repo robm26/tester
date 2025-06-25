@@ -2,21 +2,17 @@ import * as fs from 'node:fs/promises';
 import {bucketUploader} from "./lib/s3.js";
 import {runJob} from "./lib/jobExec.js";
 
-import config from '../config.json' with { type: 'json' };
+import { fileURLToPath } from 'url';
+import { URL } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const expName = __filename.substring(__filename.lastIndexOf('/')+1);
 
-const args = process.argv;
-const expName = args[1].substring(args[1].lastIndexOf('/')+1);
 
-const expArgs = args.slice(2);
-const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
-
-const operation = expArgs[1] || 'write';
+const operation = 'write';
 
 const tableNames = ['MREC', 'MRSC', 'mytable'];
 
 let summary = {
-
-    itemCount: itemCount,
 
     desc: 'Comparing request latency of regular vs conditional writes in MRSC modes of DynamoDB Global Tables',
     type: 'Line',
@@ -31,7 +27,6 @@ let summary = {
 
     operation: operation,
     expName: expName,
-    expArgs: expArgs,
 
     charts: ['LA','HI'] // latency simple and histogram
 
@@ -41,8 +36,24 @@ console.log();
 console.log('Experiment Description : ' + summary['desc']);
 console.log();
 
-const run = async () => {
-    const expName = 'E' + Math.floor(new Date().getTime() / 1000).toString();
+const run = async (req) => {
+
+    req['desc'] = summary['desc'];
+
+    console.log('expName    : ' + req['expName']);
+    console.log('itemCount  : ' + req['itemCount']);
+    console.log('desc       : ' + req['desc']);
+    console.log('bucketName : ' + req['bucketName']);
+    console.log('---------------------------------');
+
+    const itemCount = req['itemCount'] ? req['itemCount'] : 200;
+    const showEachRequest = req['showEachRequest'] ? req['showEachRequest'] : false;
+    const waitForMinute = req['waitForMinute'] ? req['waitForMinute'] : true;
+    const bucketName = req['bucketName'];
+
+    summary['itemCount'] = itemCount;
+
+    const expNum = 'E' + Math.floor(new Date().getTime() / 1000).toString();
 
     let params;
     let results;
@@ -96,19 +107,21 @@ const run = async () => {
     // *************************** Upload to S3 ***************************
     // put folder and file in S3
 
-    const fileData = await fs.readFile( '../public/experiments/' +  params.experiment + '/data.csv', 'utf-8');
-
-    const key = 'exp/' + expName + '/data.csv';
-    const keySummary = 'exp/' + expName + '/summary.json';
-
-    const res = await bucketUploader(config['bucketName'], key, fileData);
-    const res2 = await bucketUploader(config['bucketName'], keySummary, JSON.stringify(summary, null, 2));
-
-    console.log();
+        const fileData = await fs.readFile( '/tmp/' +  params.experiment + '/data.csv', 'utf-8');
+    
+        const key = 'exp/' + expNum + '/data.csv';
+        const keySummary = 'exp/' + expNum + '/summary.json';
+    
+        const res = await bucketUploader(bucketName, key, fileData);
+    
+        const res2 = await bucketUploader(bucketName, keySummary, JSON.stringify(summary, null, 2));
+    
+        return results;
 
 };
 
+export {run};
 
-void run().then(()=>{
-    process.exit(1);
-});
+// void run().then(()=>{
+//     process.exit(1);
+// });

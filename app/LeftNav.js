@@ -11,7 +11,7 @@ export default function LeftNav(props) {
     if(pathname.slice(0,5) === '/exp/') {
         activeFolder = pathname.slice(5);
     }
-    const uniqueFolders = [...new Set(folders)];
+    const uniqueFolders = [...new Set(folders)].reverse();
 
     let prev;
     let next;

@@ -11,6 +11,7 @@ import MyChart from '@/app/exp/[experiment]/chart.js';
 
 import {csv} from 'csvtojson';
 
+
 const histogramConfig = {
   "buckets": 40,
   "range": 80
@@ -218,7 +219,7 @@ export default async function Page({params}) {
     myLRstats = makeLinearStats(LRs);
   }
 
-  let experimentCommand = 'node ' + summary['expName'];
+  let experimentCommand = summary['expName'];
   if(summary['expArgs'] !== undefined) {
     experimentCommand += ' ' + summary['expArgs'].toString().replace(',', ' ');
 
@@ -228,13 +229,15 @@ export default async function Page({params}) {
     <div className={css.chartPanel}>
 
       <div className={css.expName}>
-        Job command: <span className={css.experimentCommand}>{experimentCommand}</span>
+        Job: &nbsp;&nbsp;<span className={css.experimentCommand}>
+          {experimentCommand}
+          </span>
         &nbsp;&nbsp;&nbsp;&nbsp;
         {/* Region: <span className={css.experimentCommand}>
                     {dataObj[0]['region']}
                   </span>
         &nbsp;&nbsp;&nbsp;&nbsp; */}
-        Job start (GMT): <span className={css.experimentCommand}>
+        Job start (GMT): &nbsp;&nbsp;<span className={css.experimentCommand}>
                   {eStartTime.slice(0, 19).replace('T', ' ')}
                 </span>
       </div>
@@ -269,7 +272,7 @@ export default async function Page({params}) {
 
       {/* <br/>S3 summary.json file:<br/> */}
       <pre>
-        {/* {summaryText} */}
+        {summaryText}
       </pre>
       
     </div>

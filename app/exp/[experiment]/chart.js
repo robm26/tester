@@ -1,5 +1,5 @@
 'use client'
-const hideLatency = false;
+const hideLatency = true;
 
 import css from '@/app/page.module.css';
 import { useState } from 'react';

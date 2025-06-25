@@ -33,8 +33,7 @@ console.log('Experiment Description : ' + summary['desc']);
 console.log();
 
 const run = async (req) => {
-    // console.log('---------------------------------');
-    // console.log('REQ : ' + JSON.stringify(req,null,2));
+
 
     req['desc'] = summary['desc'];
 

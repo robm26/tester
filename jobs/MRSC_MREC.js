@@ -1,10 +1,14 @@
 import * as fs from 'node:fs/promises';
-import {bucketUploader} from "./lib/s3.js";
 import {runJob} from "./lib/jobExec.js";
+import {bucketUploader} from "./lib/s3.js";
 
+import { fileURLToPath } from 'url';
+import { URL } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const expName = __filename.substring(__filename.lastIndexOf('/')+1);
 
 const args = process.argv;
-const expName = args[1].substring(args[1].lastIndexOf('/')+1);
+
 
 // const expArgs = args.slice(2);
 // const itemCount = expArgs.length > 0 ? expArgs[0] : 200;
