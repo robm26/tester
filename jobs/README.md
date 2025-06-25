@@ -18,7 +18,6 @@ node exec Writes.js 100
 
 2.  Continue by running another job to read the 100 new items.
 ```
-cd jobs
 node exec Reads.js 100
 ```
 
@@ -29,7 +28,6 @@ node exec Reads.js 100
 5. Now, run the full set of demo jobs:
  
 ```
-cd jobs
 chmod +x ./runall.sh
 ./runall.sh
 ```
